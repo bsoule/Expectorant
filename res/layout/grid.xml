@@ -1,14 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
     android:gravity="center"
+    android:orientation="vertical"
     > 
 <TableLayout 
     android:id="@+id/billygrid"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
+    android:layout_height="wrap_content"
 	android:gravity="center"    
     >
 </TableLayout>
-<Button android:id="@+id/billybutton" />
+<Button
+  android:id="@+id/billybutton"
+  android:layout_width="wrap_content"
+  android:layout_height="wrap_content"
+  android:text="BillyButton"
+  android:gravity="center"
+  ></Button>
 </LinearLayout>
