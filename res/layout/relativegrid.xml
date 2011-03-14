@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    android:background="@drawable/redtrans"
+    android:id="@+id/billysuper"
+    > 
+  <TextView
+    android:id="@+id/billycount"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:padding="2dip"
+    />
+  <EditText
+    android:id="@+id/billyprob" 
+    android:layout_height="wrap_content"
+    android:layout_width="wrap_content"
+    android:layout_weight="1.0"
+    android:hint="Enter an expression"
+    android:background="@android:drawable/editbox_background" 
+    />
+  <Button
+    android:id="@+id/billybutton"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="Billy Me" 
+    />
+  <TableLayout 
+    android:id="@+id/billygrid"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_weight="1.0"
+
+	  android:gravity="center" 
+	  />
+</RelativeLayout>
