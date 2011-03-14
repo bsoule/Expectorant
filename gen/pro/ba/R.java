@@ -11,17 +11,38 @@ public final class R {
     public static final class attr {
     }
     public static final class drawable {
-        public static final int icon=0x7f020000;
+        public static final int bg_colors_03=0x7f020000;
+        public static final int bg_colors_05=0x7f020001;
+        public static final int bg_colors_07=0x7f020002;
+        public static final int bg_colors_09=0x7f020003;
+        public static final int bg_colors_11=0x7f020004;
+        public static final int colors_grad_02=0x7f020005;
+        public static final int colors_grad_04=0x7f020006;
+        public static final int colors_grad_06=0x7f020007;
+        public static final int colors_grad_08=0x7f020008;
+        public static final int colors_grad_10=0x7f020009;
+        public static final int ic_billy=0x7f02000a;
+        public static final int ic_yellow_die=0x7f02000b;
+        public static final int icon=0x7f02000c;
+        public static final int redtrans=0x7f02000d;
     }
     public static final class id {
-        public static final int billybutton=0x7f050001;
-        public static final int billygrid=0x7f050000;
+        public static final int billybutton=0x7f050005;
+        public static final int billycount=0x7f050001;
+        public static final int billyeval=0x7f050003;
+        public static final int billyeval_label=0x7f050002;
+        public static final int billygrid=0x7f050006;
+        public static final int billyprob=0x7f050004;
+        public static final int billysuper=0x7f050000;
     }
     public static final class layout {
         public static final int grid=0x7f030000;
+        public static final int relativegrid=0x7f030001;
     }
     public static final class string {
-        public static final int app_name=0x7f040001;
-        public static final int hello=0x7f040000;
+        public static final int app_name=0x7f040000;
+        public static final int explanatory=0x7f040003;
+        public static final int out_of_bounds_err=0x7f040002;
+        public static final int parse_err=0x7f040001;
     }
 }

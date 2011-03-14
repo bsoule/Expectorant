@@ -41,15 +41,14 @@ public class BillyTilities {
        // {1,...,n}.  Note there will necessarily be k "true"s in the result.
        static boolean[] RandomKSubset(int n, int k)
        {
-               int needed = k;
                boolean[] result = new boolean[n];
                for(int i = 0; i < n; i++) {
                        // ooh, more succinct version of the following if-else:
                        // if(result[i] = bern((double)needed/(n-i))) { needed--; }
                        // though that looks like an "i used = instead of ==" bug
-                       if(bern((double)needed/(n-i))) {
+                       if(bern((double)k/(n-i))) {
                                result[i] = true;
-                               needed--;
+                               k--;
                        } else {
                                result[i] = false;
                        }
@@ -68,5 +67,59 @@ public class BillyTilities {
                int nlit = (int)(p*n) + q;
                return RandomKSubset(n, nlit);
        }
+       
+       // Convert a bit-vector (with least significant bit first) to integer.
+       static int bitvec2int(boolean[] b) {
+    	   int x=0;
+    	   int place=1;
+    	   for(boolean i : b) {
+    		   x += (i?1:0) * place;
+    		   place <<= 1;
+    	   }
+    	   return x;
+       }
+       
+       // Convert x to an n-element bit-vector, with least significant bit first.
+       static boolean[] int2bitvec(int x, int n) {
+    	   boolean[] b = new boolean[n];
+    	   for(int i=0; i<n; i++) {
+    		   b[i] = (x%2 != 0);
+    		   x >>= 1;
+    	   }
+    	   return b;
+       }
+       
+    // Convert "t@a,b" to "((t)-(a))/((b)-(a))"
+    // Convert "s:a,b,c" (any # of comma-separated items) to "(c)/((s)-(a)-(b))"
+    static String preprocess(String s) 
+    {
+      // "t @ a,b" -- t and a and b can be expressions
+      if(s.matches("^[^\\@\\,\\:]+\\@[^\\@\\,\\:]+\\,[^\\@\\,\\:]+$"))
+        s = s.replaceFirst(
+              "^\\s*([^\\@\\,]+)\\s*\\@\\s*([^\\,]+)\\,([^\\,]+)\\s*$",
+              "(($1)-($2))/(($3)-($2))");
+        // "s : a,b,c,..." -- for dinner bill splitting
+        else if(s.matches("^[^\\:\\,]+\\:[^\\:]+$")) {
+          String[] ss = s.split("[\\:\\,]");
+          int n = ss.length;
+          s = "("+ss[n-1]+")/(("+ss[0]+")";
+          if(n >= 3) {
+            for(int i = 1; i <= n-3; i++)  s += "-("+ss[i]+")";
+              s += "-(" + ss[n-2] + ")";
+          }
+          s += ")";
+        }
+      return s;
+    }
+       
+       /*
+       // Convert "t @ a,b" or "t@a-b" or variants to "(t-a)/(b-a)"
+       static String preprocess(String s) 
+       {
+    	   return s.replaceFirst(
+    			   "^\\s*([\\d\\.]+)\\s*\\@\\s*([\\d\\.]+)[^\\d\\.]+([\\d\\.]+)\\s*$",    
+                   "($1-$2)/($3-$2)");
+       }
+       */
 
 }

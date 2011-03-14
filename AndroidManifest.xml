@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
       package="pro.ba"
-      android:versionCode="1"
-      android:versionName="1.0">
+      android:versionCode="2"
+      android:versionName="1.0.1">
+    <uses-permission android:name="android.permission.VIBRATE" />  
     <application 
       android:theme="@android:style/Theme.Translucent"
-      android:icon="@drawable/ic_billy" 
+      android:icon="@drawable/ic_yellow_die" 
       android:label="@string/app_name">
 
         <activity android:name=".BillyGrid"
-                  android:label="@string/app_name" >
+                  android:label="@string/app_name" 
+                  android:windowSoftInputMode="adjustResize|stateVisible">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
