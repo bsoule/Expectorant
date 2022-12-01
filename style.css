@@ -1,0 +1,160 @@
+:root {
+  --color-bg: #69F7BE;
+}
+
+/*
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+*/
+
+@font-face {
+  font-family: HK Grotesk;
+  src: url("https://cdn.glitch.me/605e2a51-d45f-4d87-a285-9410ad350515%2FHKGrotesk-Regular.otf?v=1603136326027")
+       format("opentype");
+}
+@font-face {
+  font-family: HK Grotesk;
+  font-weight: bold;
+  src: url("https://cdn.glitch.me/605e2a51-d45f-4d87-a285-9410ad350515%2FHKGrotesk-Bold.otf?v=1603136323437")
+       format("opentype");
+}
+
+body {
+  font-family: HK Grotesk;
+  background-color: var(--color-bg);
+}
+
+h1 {
+  color: #2800FF;
+}
+
+input { 
+  height: 24px;
+  padding: 8px;
+  font-size: 16pt;
+  width: 81%;
+}
+
+#prob    { color: #999999; }
+#probpre { color: #999999; }
+
+#expectogrid td {
+  border: 1px solid #999999;
+  padding: 8px;
+  text-align: center;
+}
+
+/* #expectogrid td:nth-child(even) { background-color: #f2f2f2; } */
+/* #expectogrid tr:nth-child(even) { background-color: #f2f2f2; } */
+
+#expectogrid td:hover { background-color: #dddddd; }
+
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.pushable {
+  background: hsl(340deg 100% 32%);
+  border-radius: 12px;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  outline-offset: 4px;
+}
+.front {
+  display: block;
+  padding: 12px 42px;
+  border-radius: 12px;
+  font-size: 1.25rem;
+  background: hsl(345deg 100% 47%);
+  color: white;
+  transform: translateY(-6px);
+}
+.pushable:active .front {
+  transform: translateY(-2px);
+}
+
+.pie-chart {
+  background: conic-gradient(red 0, red 15%, green 0, green 85%);
+  width: 500px;
+  height: 500px;
+  margin: 0 auto;
+  border-radius: 50%;
+}
+
+.pie-chart .label-yes {
+  position: absolute;
+  
+}
+/*
+	.pie-chart {
+		background:
+			radial-gradient(
+				circle closest-side,
+				transparent 66%,
+				white 0
+			),
+			conic-gradient(
+				#4e79a7 0,
+				#4e79a7 38%,
+				#f28e2c 0,
+				#f28e2c 61%,
+				#e15759 0,
+				#e15759 77%,
+				#76b7b2 0,
+				#76b7b2 87%,
+				#59a14f 0,
+				#59a14f 93%,
+				#edc949 0,
+				#edc949 100%
+		);
+		position: relative;
+		width: 500px;
+		min-height: 350px;
+		margin: 0;
+		outline: 1px solid #ccc;
+	}
+	.pie-chart h2 {
+		position: absolute;
+		margin: 1rem;
+	}
+	.pie-chart cite {
+		position: absolute;
+		bottom: 0;
+		font-size: 80%;
+		padding: 1rem;
+		color: gray;
+	}
+	.pie-chart figcaption {
+		position: absolute;
+		bottom: 1em;
+		right: 1em;
+		font-size: smaller;
+		text-align: right;
+	}
+	.pie-chart span:after {
+		display: inline-block;
+		content: "";
+		width: 0.8em;
+		height: 0.8em;
+		margin-left: 0.4em;
+		height: 0.8em;
+		border-radius: 0.2em;
+		background: currentColor;
+	}
+<figure class="pie-chart">
+	<h2>World electricity generation by source</h2>
+	<figcaption>
+		Coal 38<span style="color:#4e79a7"></span><br>
+		Natural Gas 23<span style="color:#f28e2c"></span><br>
+		Hydro 16<span style="color:#e15759"></span><br>
+		Nuclear 10<span style="color:#76b7b2"></span><br>
+		Renewable 6<span style="color:#59a14f"></span><br>
+		Other 7<span style="color:#edc949"></span>
+	</figcaption>
+	<cite>International Energy Agency</cite>
+</figure>
+*/
