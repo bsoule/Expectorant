@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<link rel="icon" href="https://cdn.glitch.global/e605b8ff-1b81-42a6-81a5-17eabcdd19d1/slot-machine-32.ico?v=1666412745792"/>
+
+<title>OpenAI's Codex Made This</title>
+
+  </head>
+  <body>
+<script>
+var spinner = document.createElement('div');
+spinner.innerHTML = '<button>Spin</button>';
+spinner.style.border = '1px solid black';
+spinner.style.width = '100px';
+spinner.style.height = '100px';
+spinner.style.display = 'inline-block';
+spinner.style.textAlign = 'center';
+spinner.style.verticalAlign = 'middle';
+spinner.style.lineHeight = '100px';
+spinner.style.fontSize = '20px';
+spinner.style.fontWeight = 'bold';
+spinner.style.borderRadius = '50%';
+spinner.style.boxShadow = '0 0 10px black';
+spinner.style.cursor = 'pointer';
+spinner.style.userSelect = 'none';
+spinner.style.webkitUserSelect = 'none';
+spinner.style.mozUserSelect = 'none';
+spinner.style.msUserSelect = 'none';
+spinner.style.oUserSelect = 'none';
+spinner.style.transition = 'all 0.5s';
+spinner.style.webkitTransition = 'all 0.5s';
+spinner.style.mozTransition = 'all 0.5s';
+spinner.style.msTransition = 'all 0.5s';
+spinner.style.oTransition = 'all 0.5s';
+spinner.style.transform = 'rotate(0deg)';
+spinner.style.webkitTransform = 'rotate(0deg)';
+spinner.style.mozTransform = 'rotate(0deg)';
+spinner.style.msTransform = 'rotate(0deg)';
+spinner.style.oTransform = 'rotate(0deg)';
+spinner.onclick = function() {
+  var random = Math.random();
+  var degrees = random * 360;
+  spinner.style.transform = 'rotate(' + degrees + 'deg)';
+  spinner.style.webkitTransform = 'rotate(' + degrees + 'deg)';
+  spinner.style.mozTransform = 'rotate(' + degrees + 'deg)';
+  spinner.style.msTransform = 'rotate(' + degrees + 'deg)';
+  spinner.style.oTransform = 'rotate(' + degrees + 'deg)';
+  if (random < 0.5) {
+    spinner.innerHTML = 'YES';
+  } else {
+    spinner.innerHTML = 'NO';
+  }
+};
+document.body.appendChild(spinner);
+  
+</script>    
+</body>
+</html>
