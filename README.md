@@ -1,5 +1,8 @@
 # Expectorant: the stochastic, nerdtastic, restaurant bill splitting app (and random number spinner)
 
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/codespaces/new?hide_repo_select=true&ref=master&repo=649443)
+
+
 ## How do you use this?
 *Enter a probability* (between 0 and 1) or an arithmetic expression that evaluates to a probability and press _Expectorize_.
 A subset of the numbers 1-20 will light up such that any given number will be lit up with the given probability.
