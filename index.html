@@ -39,8 +39,6 @@
             <div class="content" role="main">
                 <h1>Expectorant</h1>
 
-                <h2>(This does not at all work yet what are you doing here?)</h2>
-
                 <p>
                     <input id="expr" type="text" size="38" placeholder="Expression that evaluates to a probability" />
                     &nbsp; <span id="probpre">p=</span><span id="prob">0%</span>
@@ -177,4 +175,49 @@ function desugar(s) {
 */
 
   </script>
+  
+<details>
+<summary style="cursor: pointer"><i>instructions</i></summary>
+
+<br>
+Expectorant is a stochastic, nerdtastic, restaurant bill splitting app and random number spinner.
+
+<h2>How do you use this?</h2>
+
+<i>Enter a probability</i> (between 0 and 1) or an arithmetic expression that evaluates to a probability and press <i>Expectorize</i>.
+
+<h2>Typical use case</h2>
+
+Say you owe me $7 for lunch but only have a twenty.
+If you give me the twenty with probability 7/20 then in expectation you've paid me $7!
+So type in *7/20* and spin the spinner.
+If it comes up green then I lucked out and get the $20. 
+
+<h2>Advanced feature for exact (expected) change</h2>
+
+Entering something like <b>7@5,20</b> is a shortcut for <b>(7-5)/(20-5)</b>. 
+That's the probability p such that (1-p)*5 + p*20 = 7. 
+WTF? Here's TF: If you have a five and a twenty and owe me $7, then give me the twenty with that probability and the five otherwise. 
+Exquisitely fair (in expectation)!
+
+<h2>Stochastic nerdtastic restaurant bill splitting</h2>
+
+Say the subtotal is $100 and the items on the bill are $5, $25, $60, and $10. 
+Enter <b>100:5</b> and have the person who ordered the $5 item spin the spinner.
+If it comes up green (a 5% chance) they get to pay the whole bill! 
+If not, amend the expression as <b>100:5,25</b> and repeat for the person who got the $25 item. 
+They'll "win" with probability 25/(100-5). 
+If they're off the hook, amend again to <b>100:5,25,60</b>. 
+This time most likely &mdash; p = 60/(100-5-25) &mdash; the $60 person will win the honor of paying the bill. 
+If not, notice that <b>100:5,25,60,10</b> yields 10/(100-5-25-60) = 1. 
+So if the process makes it to the last item on the bill then whoever got that item is it.
+Mathemagically, it doesn't matter what order you put the items in &mdash; each person "wins" (pays the whole bill) with probability equal to their own fair share of the bill.
+In other words, you pay in expectation exactly your fair share. 
+Including tax and tip, even though we never entered those.
+Pretty slick! 
+Speaking of tips, you can minimize the hassle by starting with the most expensive items.
+Then you don't have to figure out who most of the items belong to.
+Oh, and if 3 people split the $10 pickled monkey balls just treat it as 3 items, $10/3 each (expressions instead of numbers are allowed).
+  
+</details>
 </html>
