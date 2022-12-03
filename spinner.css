@@ -5,13 +5,10 @@
 } 
 
 .spin_wrapper {
-	position: fixed;
-	top: 50%;
-	left: 50%;
-	width: 300px;
-	height: 300px;
-	margin-top: -150px;
-	margin-left: -150px;
+	max-width: 250px;
+    max-height: 250px;
+    position: relative;
+    margin: auto;
 	border-radius: 50%;
 	background: #ffffff;
 	border: 2px solid #ffffff;

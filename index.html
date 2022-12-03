@@ -54,12 +54,6 @@
                     </center>
 
                     <audio id="audiotag1" src="https://cdn.glitch.global/e605b8ff-1b81-42a6-81a5-17eabcdd19d1/beepboop.wav?v=1666556484855" preload="auto"></audio>
-                    <a href="javascript:play_single_sound();">Play</a>
-                    <script type="text/javascript">
-                        function play_single_sound() {
-                            document.getElementById("audiotag1").play();
-                        }
-                    </script>
                 </p>
 <!-- We'll worry about instructions later.
 <div class="instructions">
@@ -74,7 +68,7 @@ Instructions can go here later. Or check out
         </div>
         <!-- wrapper -->
 
-        <div>
+        <div class="spin_container">
           <div id="my-spinner" class="spin_wrapper"></div>
         </div>
     </body>
@@ -104,7 +98,15 @@ Instructions can go here later. Or check out
         // configure button event
         $('#expectorize').click(function(e){
           e.preventDefault();
-          spinner.start(s);
+          document.getElementById("audiotag1").play();
+          spinner.redraw(s);
+          // TODO: MATH TO FIGURE OUT WHO WINS
+          if (Math.random() > 0.5) {
+            spinner.start(s, 0);
+          }
+          else {
+            spinner.start(s, 1);
+          }
         });
 
         $('#expr').on("input propertychange",(e) => {

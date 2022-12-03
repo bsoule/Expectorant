@@ -42,7 +42,10 @@ function arcPath(x, y, radius, endradius, startAngle, endAngle) {
 }
 
 
-
+function computeRotation(duration, speed) {
+    const dr = duration;// / 1000.0;
+    return (2*dr*speed- speed*dr*(2/Math.PI + 1));
+}
 
 // Executes the animation frame using css
 var spin_anim = function(spin){
@@ -57,30 +60,50 @@ var spin_anim = function(spin){
 };
 
 // Starts the Spinner
-function spin_start(spin) {
+// spin is the spin object, winner is the index for the slot that wins.
+function spin_start(spin, winner) {
+    // Reset to zero
+    spin.degree = 0;
+    spin.obj.css('transform', 'rotate(' + spin.degree + 'deg)');
+    // start the spinner
 	spin.stop = false;
 	spin_anim(spin);
 	spin.rand_speed = Math.random();
-	$( spin ).animate({speed: spin.spinSpeed}, 0.15*spin.min_duration, "easeInBack", function(){
-		$( spin ).animate({speed: 0}, (spin.min_duration + (spin.max_duration-spin.min_duration)*spin.rand_speed), "easeOutSine", function(){
-			spin_stop(spin);
+    spin.speed = spin.spinSpeed;
+    var duration = spin.min_duration + (spin.max_duration-spin.min_duration)*spin.rand_speed;
+    //duration = 6873;
+    //duration = 10;
+    const rotationTot = computeRotation(duration, spin.spinSpeed);
+    console.log("rotationTot ", rotationTot);
+    const oneRot = filter_degree(rotationTot);
+    console.log("rotation ", oneRot);
+	//$( spin ).animate({speed: spin.spinSpeed}, 0.15*spin.min_duration, "easeInBack", function(){
+		$( spin ).animate({speed: 0}, duration, "easeOutSine", function(){
+			spin_stop(spin, winner);
 		});
-	});
+	//});
 }
 
 // Stops the Spinner
-function spin_stop(spin) {
+function spin_stop(spin, winner) {
 	spin.stop = true;
-	var values = spin.obj.css('transform'),
-		values = values.split('(')[1],
-		values = values.split(')')[0],
-		values = values.split(',');
-	var d = filter_degree( Math.atan2(values[1], values[0]) * (180/Math.PI) );
-    console.log("deg: ", d);
-	var p = (360/spin.slots.length);
-	var slot = Math.floor((360-d) / p);
-	console.log(d + ' => slot #' + slot + ' => ' + spin.slots[slot].value );
-	//alert( spin.slots[slot].value );
+    console.log("deg:", spin.degree);
+    // The winner is the index of the slot that wins, so we want to figure out
+    // what slot that is, and draw a new outline pie over it to show that's the winner!
+    const total_weight = spin.slots.map(i => i.weight).reduce((p, c) => p+c);
+    const normals = spin.slots.map(i => i.weight / total_weight);
+    var startAngle = 0;
+    var svg = spin.obj.html();
+    for (var i=0; i<spin.slots.length; i++) {
+        const endAngle = startAngle + 360*normals[i];
+        if (i === winner) {
+            svg = svg + '<path d="' + arcPath(50,50, 5, 50, (startAngle), (endAngle)) + '" fill="#00000000" stroke="#ffffff" stroke-width="2" />';
+            spin.obj.html(svg);
+            return;
+        }
+        startAngle = endAngle;
+    }
+
 }
 
 function setSpinnerNaN(spin) {
@@ -90,15 +113,11 @@ function setSpinnerNaN(spin) {
     updateSpiner(spin, slots);
 }
 
-function updateSpiner(spin, slots) {
-    spin.slots = slots;
-    if (spin.slots.length < 2)
-        throw "You must specify at least two options";
-
-
+function redrawSpinner(spin) {
     // draw the spinner
     var total_weight = spin.slots.map(i => i.weight).reduce((p, c) => p+c);
     var normals = spin.slots.map(i => i.weight / total_weight);
+    const textOffset = spin.slots.length <= 4 ? 35 : 45;
 
     var svg = '';
     // check to see if one of the normals is at 1, if it is we want to draw the 
@@ -110,7 +129,7 @@ function updateSpiner(spin, slots) {
         // then we have to opt out of the arc and draw a circle.
         svg = svg + '<circle cx="50" cy="50" r="50" fill="' + spin.slots[iAtOne].color + '"/>';
         svg = svg + '<circle cx="50" cy="50" r="5" fill="white"/>';
-        const t = polarToCartesian(50, 50, 45, 0);
+        const t = polarToCartesian(50, 50, textOffset, 0);
         svg = svg + '<text font-size="10" x="' + t.x + '" y="' + t.y + '" fill="#000000" font-style="bold" font-family="Arial" alignment-baseline="central" text-anchor="middle" transform="rotate(' + (0) + ' ' + t.x + ',' + t.y + ')" stroke="#000000" stroke-width="1" opacity="0.3">' + spin.slots[iAtOne].value + '</text>';
         svg = svg + '<text font-size="10" x="' + t.x + '" y="' + t.y + '" fill="#ffffff" font-style="bold" font-family="Arial" alignment-baseline="central" text-anchor="middle" transform="rotate(' + (0) + ' ' + t.x + ',' + t.y + ')">' + spin.slots[iAtOne].value + '</text>';
         
@@ -118,20 +137,35 @@ function updateSpiner(spin, slots) {
         spin.obj.html( svg );
         return spin;
     }
+    // draw the pie parts
     var startAngle = 0;
     for (var i=0; i<spin.slots.length; i++) {
         const endAngle = startAngle + 360*normals[i];
         svg = svg + '<path d="' + arcPath(50,50, 5, 50, (startAngle), (endAngle)) + '" fill="' + spin.slots[i].color + '" stroke="#ffffff" stroke-width="0" />';
+        startAngle = endAngle;
+    }
+    // draw the text on top of the pie parts
+    for (var i=0; i<spin.slots.length; i++) {
+        const endAngle = startAngle + 360*normals[i];
         // compute the location of the text
         const midAngle = startAngle + (endAngle - startAngle)/2;
-        const t = polarToCartesian(50, 50, 45, midAngle);
+        const t = polarToCartesian(50, 50, textOffset, midAngle);
         svg = svg + '<text font-size="6" x="' + t.x + '" y="' + t.y + '" fill="#000000" font-style="bold" font-family="Arial" alignment-baseline="central" text-anchor="middle" transform="rotate(' + (midAngle) + ' ' + t.x + ',' + t.y + ')" stroke="#000000" stroke-width="1" opacity="0.3">' + spin.slots[i].value + '</text>';
         svg = svg + '<text font-size="6" x="' + t.x + '" y="' + t.y + '" fill="#ffffff" font-style="bold" font-family="Arial" alignment-baseline="central" text-anchor="middle" transform="rotate(' + (midAngle) + ' ' + t.x + ',' + t.y + ')">' + spin.slots[i].value + '</text>';
         startAngle = endAngle;
+
     }
     spin.obj.html( svg );
 
     return spin;
+}
+
+function updateSpiner(spin, slots) {
+    spin.slots = slots;
+    if (spin.slots.length < 2)
+        throw "You must specify at least two options";
+
+    return redrawSpinner(spin);
 }
 
 function spinner(div, slots) {
@@ -163,8 +197,8 @@ function compute2Slots(p) {
     if (p < 0 || p >1)
         throw "Probability must be between 0 and 1";
     return [
-        {value:'YES', color: 'green', weight: p},
-        {value:'NO', color: 'red', weight: 1-p},
+        {value:'YES/💰/⬆️', color: 'green', weight: p},
+        {value:'NO/🆓/⬇️', color: 'red', weight: 1-p},
     ]
 }
 
@@ -173,5 +207,6 @@ window.spinner = {
     start: spin_start,
     compute2Slots: compute2Slots,
     update: updateSpiner,
-    setNan: setSpinnerNaN
+    setNan: setSpinnerNaN,
+    redraw: redrawSpinner
 };
