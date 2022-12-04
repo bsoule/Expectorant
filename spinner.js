@@ -103,6 +103,7 @@ function spin_start(spin, winner) {
     // and then computing the time at that position and updating the duration to match.
 
     // 1 - Figure out the min and max angle/rotation for the winner
+    console.log(`DEBUG: winner = ${winner} of ${spin.slots.length} slots`)
     const win = spin.slots[winner]; //start/endAngle.
     // 2 - compute the rotation angles for the given duration
     const rotationTot = computeTotalRotation(spin.duration, spin.startTime, spin.spinSpeed);
