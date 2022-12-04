@@ -135,8 +135,7 @@ $(document).ready(function(){
     e.preventDefault()
     document.getElementById("audiotag1").play()
     spinner.redraw(s)
-    // is prob actually available to us in this part of the code?
-    const prob = .33 // make something up for now
+    const prob = Number($("#prob").html())
     spinner.start(s, spinpick([0, 1], [prob, 1-prob]))
   });
   
