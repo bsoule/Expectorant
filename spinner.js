@@ -45,24 +45,31 @@ function arcPath(x, y, radius, endradius, startAngle, endAngle) {
 function computeTotalRotation(duration, startTime, startSpeed) {
     const currentTime = startTime + duration - 0.01;
     return computeRotation(duration, startTime, startSpeed, currentTime);
-    //const dr = duration;// / 1000.0;
-    //return (2*dr*speed- speed*dr*(2/Math.PI + 1));
 }
 
 function computeRotation(duration, startTime, startSpeed, currentTime) {
     const t = currentTime - startTime;
-    return startSpeed * (2*duration*Math.cos((Math.PI*t)/(2*duration))/Math.PI + duration + t) - startSpeed * duration * (2/Math.PI + 1);
+    // Old version that used a sine-based easing function.
+    //return startSpeed * (2*duration*Math.cos((Math.PI*t)/(2*duration))/Math.PI + duration + t) - startSpeed * duration * (2/Math.PI + 1);
+    return -(startSpeed / (2.5*duration)) * (t-duration)**2 + startSpeed * duration / 2.5;
 }
+
+function computeTimeFromRotation(duration, startSpeed, rotation) {
+    return 2.5*rotation / startSpeed;
+}
+
 
 function computeSpeed(duration, startTime, startSpeed, currentTime) {
     const t = currentTime - startTime;
-    return -Math.cos((1 - t/duration) * Math.PI/2)*startSpeed + startSpeed;
+    //return -Math.cos((1 - t/duration) * Math.PI/2)*startSpeed + startSpeed;
+    return 0.8 * startSpeed * (duration - t) / duration
 }
+
 
 // Executes the animation frame using css
 var spin_anim = function(spin){
     if (spin.speed < 0.01) {
-        setTimeout(spin_stop(spin, 0), 0);
+        setTimeout(spin_stop(spin), 0);
         return true; 
     }
     const t = (new Date()).getTime();
@@ -70,7 +77,7 @@ var spin_anim = function(spin){
     // the spin is being eased, but what we want is to compute the current location
     spin.degree = computeRotation(spin.duration, spin.startTime, spin.spinSpeed, t);
 	spin.degree = filter_degree(spin.degree);
-	spin.obj.css('transform', 'rotate(' + spin.degree + 'deg)');
+	spin.obj.css('transform', 'rotate(-' + spin.degree + 'deg)');
     // curry this.
     var sa = function() {
         spin_anim(spin);
@@ -83,12 +90,14 @@ var spin_anim = function(spin){
 function spin_start(spin, winner) {
     // Reset to zero
     spin.degree = 0;
-    spin.obj.css('transform', 'rotate(' + spin.degree + 'deg)');
+    spin.winner = winner;
+    spin.obj.css('transform', 'rotate(-' + spin.degree + 'deg)');
     spin.startTime = (new Date()).getTime();
     // start the spinner
 	spin.rand_speed = Math.random();
     spin.speed = spin.spinSpeed;
     spin.duration = spin.min_duration + (spin.max_duration-spin.min_duration)*spin.rand_speed;
+    console.log("duration", spin.duration);
 
     // compute the total rotation, and figure out if it is landing on the winner. If not,
     // then adjust the duration so that we do land on the winner by determining a position
@@ -102,17 +111,29 @@ function spin_start(spin, winner) {
     const oneRot = filter_degree(rotationTot);
     console.log("rotation ", oneRot);
     // 3 - figure out if we are already there, or if we need to move things around?
+    if (oneRot < win.startAngle || oneRot > win.endAngle) {
+        // not inside the winner, so determine how much more we need by finding
+        // a random value between start and end
+        const ranAngle = Math.random() * (win.endAngle - win.startAngle) + win.startAngle;
+        // decide how much to add to oneRot to get to ranAgnle, then do that to rotationTot instead
+        const newTot = rotationTot + (ranAngle - oneRot);
+        console.log("newTot", newTot);
+        // newTot should now be valid, so we need to compute a duration that can get us to this total.
+        const newTime = computeTimeFromRotation(spin.duration, spin.spinSpeed, newTot);
+        console.log("newDuration", newTime);
+        spin.duration = newTime;
+    }
 
 	spin_anim(spin);
 }
 
 // Stops the Spinner
-function spin_stop(spin, winner) {
+function spin_stop(spin) {
     // compute where it is supposed to be and snap it there
     // this shouldn't be more than a degree or two off from the animation.
     const rotationTot = computeTotalRotation(spin.duration, spin.startTime, spin.spinSpeed);
     spin.degree = filter_degree(rotationTot);
-    spin.obj.css('transform', 'rotate(' + spin.degree + 'deg)');
+    spin.obj.css('transform', 'rotate(-' + spin.degree + 'deg)');
     console.log("deg:", spin.degree);
     // The winner is the index of the slot that wins, so we want to figure out
     // what slot that is, and draw a new outline pie over it to show that's the winner!
@@ -122,15 +143,9 @@ function spin_stop(spin, winner) {
     const normals = spin.slots.map(i => i.weight / total_weight);
     var startAngle = 0;
     var svg = spin.obj.html();
-    for (var i=0; i<spin.slots.length; i++) {
-        const endAngle = startAngle + 360*normals[i];
-        if (i === winner) {
-            svg = svg + '<path d="' + arcPath(50,50, 5, 50, (startAngle), (endAngle)) + '" fill="#00000000" stroke="#ffffff" stroke-width="2" />';
-            spin.obj.html(svg);
-            return;
-        }
-        startAngle = endAngle;
-    }
+    const win = spin.slots[spin.winner];
+    svg = svg + '<path d="' + arcPath(50,50, 5, 50, (win.startAngle), (win.endAngle)) + '" fill="#00000000" stroke="#ffffff" stroke-width="2" />';
+    spin.obj.html(svg);
 
 }
 
@@ -210,9 +225,10 @@ function spinner(div, slots) {
         degree: 0,
         obj: div.children("svg"),
         min_duration: 3000,
-        max_duration: 8000,
+        max_duration: 5000,
         rand_speed: 0,
         duration: 0,
+        winner: -1,
         startTime: (new Date()).getTime()
     };
 
