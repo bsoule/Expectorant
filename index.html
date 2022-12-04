@@ -132,16 +132,11 @@ $(document).ready(function(){
   
   // configure button event
   $('#expectorize').click(function(e){
-    e.preventDefault();
-    document.getElementById("audiotag1").play();
-    spinner.redraw(s);
-    // TODO: MATH TO FIGURE OUT WHO WINS
-    if (Math.random() > 0.5) {
-      spinner.start(s, 0);
-    }
-    else {
-      spinner.start(s, 1);
-    }
+    e.preventDefault()
+    document.getElementById("audiotag1").play()
+    spinner.redraw(s)
+    // is prob actually available to us in this part of the code?
+    spinner.start(s, spinpick(["YES", "NO"], [prob, 1-prob]))
   });
   
   $('#expr').on("input propertychange",(e) => {
