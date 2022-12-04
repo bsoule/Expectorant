@@ -97,7 +97,6 @@ function spin_start(spin, winner) {
 	spin.rand_speed = Math.random();
     spin.speed = spin.spinSpeed;
     spin.duration = spin.min_duration + (spin.max_duration-spin.min_duration)*spin.rand_speed;
-    console.log("duration", spin.duration);
 
     // compute the total rotation, and figure out if it is landing on the winner. If not,
     // then adjust the duration so that we do land on the winner by determining a position
@@ -107,9 +106,7 @@ function spin_start(spin, winner) {
     const win = spin.slots[winner]; //start/endAngle.
     // 2 - compute the rotation angles for the given duration
     const rotationTot = computeTotalRotation(spin.duration, spin.startTime, spin.spinSpeed);
-    console.log("rotationTot ", rotationTot);
     const oneRot = filter_degree(rotationTot);
-    console.log("rotation ", oneRot);
     // 3 - figure out if we are already there, or if we need to move things around?
     if (oneRot < win.startAngle || oneRot > win.endAngle) {
         // not inside the winner, so determine how much more we need by finding
@@ -117,10 +114,8 @@ function spin_start(spin, winner) {
         const ranAngle = Math.random() * (win.endAngle - win.startAngle) + win.startAngle;
         // decide how much to add to oneRot to get to ranAgnle, then do that to rotationTot instead
         const newTot = rotationTot + (ranAngle - oneRot);
-        console.log("newTot", newTot);
         // newTot should now be valid, so we need to compute a duration that can get us to this total.
         const newTime = computeTimeFromRotation(spin.duration, spin.spinSpeed, newTot);
-        console.log("newDuration", newTime);
         spin.duration = newTime;
     }
 
@@ -134,7 +129,6 @@ function spin_stop(spin) {
     const rotationTot = computeTotalRotation(spin.duration, spin.startTime, spin.spinSpeed);
     spin.degree = filter_degree(rotationTot);
     spin.obj.css('transform', 'rotate(-' + spin.degree + 'deg)');
-    console.log("deg:", spin.degree);
     // The winner is the index of the slot that wins, so we want to figure out
     // what slot that is, and draw a new outline pie over it to show that's the winner!
 
