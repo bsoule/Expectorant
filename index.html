@@ -137,7 +137,7 @@ $(document).ready(function(){
     spinner.redraw(s)
     // is prob actually available to us in this part of the code?
     const prob = .33 // make something up for now
-    spinner.start(s, spinpick(["YES", "NO"], [prob, 1-prob]))
+    spinner.start(s, spinpick([0, 1], [prob, 1-prob]))
   });
   
   $('#expr').on("input propertychange",(e) => {
