@@ -1,3 +1,15 @@
+<!-- 
+  We're not actually using this for anything but were curious to try OpenAI's 
+  Codex on the problem of making an interactive spinner. It fell on its face the
+  first couple things we tried but when we tried this:
+
+  "Make a spinner that when you click a button spins the spinner and it lands on
+  either YES or NO"
+
+  it generated the code in this file, which is kind of a version of that 
+  sentence.
+-->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,8 +20,8 @@
 
 <title>OpenAI's Codex Made This</title>
 
-  </head>
-  <body>
+</head>
+<body>
 <script>
 var spinner = document.createElement('div');
 spinner.innerHTML = '<button>Spin</button>';
@@ -54,8 +66,50 @@ spinner.onclick = function() {
     spinner.innerHTML = 'NO';
   }
 };
-document.body.appendChild(spinner);
-  
+document.body.appendChild(spinner);  
 </script>    
 </body>
 </html>
+
+<!-- PS: The above was before ChatGPT. 
+  Check out what ChatGPT can do, as of 2022-12-03:
+
+Prompt: Write a Javascript function that takes an array of strings and list of non-negative weights and returns a random element from the list of strings, weighted by the weights. For example, if the strings are ["apple", "banana", "cherry"] and the weights are [1, 1, 1] then it returns either "apple" or "banana" or "cherry" with equal probability. If the weights were [1, 2, 1] then it would return "banana" with 50% probability and the other two with 25% probability each.
+
+Answer: Here is one way to implement a function that takes an array of strings and an array of weights and returns a random element from the list of strings, weighted by the weights:
+
+function weightedRandom(strings, weights) {
+  // make sure the arrays are not empty and have the same number of elements
+  if (strings.length === 0 || weights.length === 0 || strings.length !== weights.length) {
+    return null;
+  }
+
+  // generate a random number between 0 and the sum of the weights
+  let totalWeight = weights.reduce((acc, weight) => acc + weight, 0);
+  let random = Math.random() * totalWeight;
+
+  // find the string with the corresponding weight
+  let weightSum = 0;
+  for (let i = 0; i < strings.length; i++) {
+    weightSum += weights[i];
+    if (random < weightSum) {
+      return strings[i];
+    }
+  }
+
+  // if no string is found, return null
+  return null;
+}
+
+/* Here is an example of how to use this function: */
+
+let strings = ["apple", "banana", "cherry"];
+let weights = [1, 1, 1];
+let randomString = weightedRandom(strings, weights);
+console.log(randomString); // prints "apple" or "banana" or "cherry" with equal probability
+
+ChatGPT continues:
+
+Note that the function uses `Math.random()` to generate a random number between 0 and 1, which it then scales by the sum of the weights to get a random number between 0 and the sum of the weights. It then iterates over the strings and weights arrays and returns the string with the corresponding weight when the random number is less than the sum of the weights up to that point.
+
+-->

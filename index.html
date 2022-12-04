@@ -1,138 +1,147 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="https://cdn.glitch.global/e605b8ff-1b81-42a6-81a5-17eabcdd19d1/slot-machine-32.ico?v=1666412745792" />
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="icon" href="https://cdn.glitch.global/e605b8ff-1b81-42a6-81a5-17eabcdd19d1/slot-machine-32.ico?v=1666412745792" />
 
-        <title>Expectorant</title>
+<title>Expectorant <span style="font-color:gray">v2022.12.04</span></title>
 
-        <!-- Meta tags for SEO and social sharing -->
-        <link rel="canonical" href="https://glitch-hello-website.glitch.me/" />
-        <meta name="description" content="Random bill splitting and generalized dice roller. Fairness in expectation!" />
-        <meta name="robots" content="index,follow" />
-        <meta property="og:title" content="Expectorant" />
-        <meta property="og:type" content="article" />
-        <meta property="og:url" content="https://expectorant.glitch.me/" />
-        <meta property="og:description" content="Generalized dice-roller / Bernoulli-trialler. Exquisite fairness in expectation!" />
-        <meta property="og:image" content="https://cdn.glitch.global/e605b8ff-1b81-42a6-81a5-17eabcdd19d1/slot-machine-32.ico?v=1666412745792" />
-        <meta name="twitter:card" content="summary" />
+<!-- Meta tags for SEO and social sharing -->
+<link rel="canonical" href="https://glitch-hello-website.glitch.me/" />
+<meta name="description" content="Random bill splitting and generalized dice roller. Fairness in expectation!" />
+<meta name="robots" content="index,follow" />
+<meta property="og:title" content="Expectorant" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://expectorant.glitch.me/" />
+<meta property="og:description" content="Generalized dice-roller / Bernoulli-trialler. Exquisite fairness in expectation!" />
+<meta property="og:image" content="https://cdn.glitch.global/e605b8ff-1b81-42a6-81a5-17eabcdd19d1/slot-machine-32.ico?v=1666412745792" />
+<meta name="twitter:card" content="summary" />
 
-        <link rel="stylesheet" href="/style.css" />
-        <!--
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/css/bootstrap.min.css"/>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/css/bootstrap-responsive.min.css"/>
--->
+<link rel="stylesheet" href="/style.css" />
 
-        <script src="https://d3js.org/d3.v7.min.js"></script>
-        <!-- <script src="/script.js" defer></script> -->
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<!-- <script src="/script.js" defer></script> -->
 
-        <!-- for the spinner! -->
-        <script src="https://code.jquery.com/jquery-3.6.1.min.js" integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
-        <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js" integrity="sha256-lSjKY0/srUM9BE3dPm+c4fBo1dky2v27Gdjm2uoZaL0=" crossorigin="anonymous"></script>
-        <link rel="stylesheet" href="spinner.css" />
-        <script src="spinner.js"></script>
-    </head>
-    <body>
-        <!-- The wrapper and content divs set margins and positioning -->
-        <div class="wrapper">
-            <div class="content" role="main">
-                <h1>Expectorant</h1>
+<!-- for the spinner! -->
+<script src="https://code.jquery.com/jquery-3.6.1.min.js"
+  integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" 
+  crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js" 
+  integrity="sha256-lSjKY0/srUM9BE3dPm+c4fBo1dky2v27Gdjm2uoZaL0=" 
+  crossorigin="anonymous"></script>
+<link rel="stylesheet" href="spinner.css" />
+<script src="spinner.js"></script>
+</head>
+<body>
 
-                <p>
-                    <input id="expr" type="text" size="38" placeholder="Expression that evaluates to a probability" />
-                    &nbsp; <span id="probpre">p=</span><span id="prob">0%</span>
-                    <br />
-                    <center>
-                        <button id="expectorize" class="pushable">
-                            <span class="front">
-                                Expectorize
-                            </span>
-                        </button>
-                    </center>
+<!-- The wrapper and content divs set margins and positioning -->
+<div class="wrapper">
+  <div class="content" role="main">
+    <h1>Expectorant</h1>
 
-                    <audio id="audiotag1" src="https://cdn.glitch.global/e605b8ff-1b81-42a6-81a5-17eabcdd19d1/beepboop.wav?v=1666556484855" preload="auto"></audio>
-                </p>
-<!-- We'll worry about instructions later.
-<div class="instructions">
-<p>
-Instructions can go here later. Or check out 
-<a href="http://messymatters.com/expectorant" title="Stochastic, Nerdtastic Restaurant Bill Splitting">the original blog post</a>.
-</p>
+    <p>
+    <input id="expr" type="text" size="38" placeholder="Expression that evaluates to a probability" />
+    &nbsp; <span id="probpre">p=</span><span id="prob">0%</span>
+    <br />
+    <center>
+      <button id="expectorize" class="pushable">
+        <span class="front">Expectorize</span>
+      </button>
+    </center>
+
+    <audio id="audiotag1" src="https://cdn.glitch.global/e605b8ff-1b81-42a6-81a5-17eabcdd19d1/beepboop.wav?v=1666556484855" preload="auto"></audio>
+    </p>
+  </div> <!-- main -->
+</div> <!-- wrapper -->
+
+<div class="spin_container">
+  <div id="my-spinner" class="spin_wrapper"></div>
 </div>
--->
-            </div>
-            <!-- main -->
-        </div>
-        <!-- wrapper -->
 
-        <div class="spin_container">
-          <div id="my-spinner" class="spin_wrapper"></div>
-        </div>
-    </body>
-    <script>
-      // Eval but just return null if syntax error.
-      // Obviously don't use serverside with user-supplied input.
-      function laxeval(s) {
-        try {
-          const x = eval(s);
-          return typeof x === "undefined" ? null : x;
-        } catch (e) {
-          return null;
-        }
-      }
+<script>
+// Renormalize a list of weights to sum to 1
+function renorm(w) {
+  const tot = w.reduce((a,b)=>a+b)
+  return w.map(x=>x/tot)
+}
 
-      function parsefrac(s) {
-        s = s.replace(/^([^\%]*)\%(.*)$/, "($1)/100$2");
-        const x = laxeval(s);
-        return x === null ? NaN : x;
-      }
+// Return a list of the cumulative sums of l. Eg, [1,2,3] -> [1,3,6]
+function accum(l) {
+  let s = 0
+  return l.map(x => { s += x; return s })
+}
 
-      $(document).ready(function(){
-        // configure the spinner
-        var slots = spinner.compute2Slots(0.5);
-        var s = spinner.create($('#my-spinner'), slots);
+// Take a number p in [0,1] and list of non-negative weights w and return the
+// (0-based) index of the appropriate weight. Eg, if the weights are [99, 1]
+// then for all p up to .99 this will return 0 and for .99 < p <= 1 it return 1.
+function spinHelper(p, w) {
+  const cp = accum(renorm(w)) // cumulative probabilities, ending with 1
+  for (let i = 0; i < w.length; i++) { if (p < cp[i]) return i }
+  return -1 // something went horribly wrong if we reach this line
+}
 
-        // configure button event
-        $('#expectorize').click(function(e){
-          e.preventDefault();
-          document.getElementById("audiotag1").play();
-          spinner.redraw(s);
-          // TODO: MATH TO FIGURE OUT WHO WINS
-          if (Math.random() > 0.5) {
-            spinner.start(s, 0);
-          }
-          else {
-            spinner.start(s, 1);
-          }
-        });
+// Randomly return an element of the list l, weighted by w.
+// Eg, spinpick(["a","b","c"], [1,2,1]) returns "a" w/ p=.25, "b" w/ p=.5 etc
+function spinpick(l, w) { return l[spinHelper(Math.random(), w)] }
 
-        $('#expr').on("input propertychange",(e) => {
-          // each time the prob changes, update the spinner
-          try {
-            // Convert the expression to a prob
-            const prob = parsefrac(e.target.value);
-            $("#prob").html(prob);
+// Eval but just return null if syntax error.
+// Obviously don't use serverside with user-supplied input.
+function laxeval(s) {
+  try {
+    const x = eval(s);
+    return typeof x === "undefined" ? null : x;
+  } catch (e) {
+    return null;
+  }
+}
+
+function parsefrac(s) {
+  s = s.replace(/^([^\%]*)\%(.*)$/, "($1)/100$2");
+  const x = laxeval(s);
+  return x === null ? NaN : x;
+}
+
+$(document).ready(function(){
+  // configure the spinner
+  var slots = spinner.compute2Slots(0.5);
+  var s = spinner.create($('#my-spinner'), slots);
   
-            // Set the spinner as needed
-            if (isNaN(prob)) {
-              return;
-            }
-            var slots = spinner.compute2Slots(Number(prob));
-            spinner.update(s, slots);
-          } catch (error) {
-            spinner.setNan(s);
-          }
-        });
+  // configure button event
+  $('#expectorize').click(function(e){
+    e.preventDefault();
+    document.getElementById("audiotag1").play();
+    spinner.redraw(s);
+    // TODO: MATH TO FIGURE OUT WHO WINS
+    if (Math.random() > 0.5) {
+      spinner.start(s, 0);
+    }
+    else {
+      spinner.start(s, 1);
+    }
+  });
+  
+  $('#expr').on("input propertychange",(e) => {
+    // each time the prob changes, update the spinner
+    try {
+      // Convert the expression to a prob
+      const prob = parsefrac(e.target.value);
+      $("#prob").html(prob);
+      
+      // Set the spinner as needed
+      if (isNaN(prob)) {
+        return;
+      }
+      var slots = spinner.compute2Slots(Number(prob));
+      spinner.update(s, slots);
+    } catch (error) {
+      spinner.setNan(s);
+    }
+  });
+  
+});
 
-      });
-    </script>
-
-  <script>
-
-    
-
-    /*
+/*
 // -----------------------------------------------------------------------------
 // Macro-expand the syntactic sugar with `@` and `:`, namely:
 //  * convert "t@a,b" to "((t)-(a))/((b)-(a))"
@@ -176,7 +185,7 @@ function desugar(s) {
 }
 */
 
-  </script>
+</script>
   
 <details>
 <summary style="cursor: pointer"><i>instructions</i></summary>
@@ -186,24 +195,31 @@ Expectorant is a stochastic, nerdtastic, restaurant bill splitting app and rando
 
 <h2>How do you use this?</h2>
 
+<p>
 <i>Enter a probability</i> (between 0 and 1) or an arithmetic expression that evaluates to a probability and press <i>Expectorize</i>.
+</p>
 
 <h2>Typical use case</h2>
 
+<p>
 Say you owe me $7 for lunch but only have a twenty.
 If you give me the twenty with probability 7/20 then in expectation you've paid me $7!
 So type in <b>7/20</b> and spin the spinner.
 If it comes up green then I lucked out and get the $20. 
+</p>
 
 <h2>Advanced feature for exact (expected) change</h2>
 
+<p>
 Entering something like <b>7@5,20</b> is a shortcut for <b>(7-5)/(20-5)</b>. 
 That's the probability p such that (1-p)*5 + p*20 = 7. 
 WTF? Here's TF: If you have a five and a twenty and owe me $7, then give me the twenty with that probability and the five otherwise. 
 Exquisitely fair (in expectation)!
+</p>
 
 <h2>Stochastic nerdtastic restaurant bill splitting</h2>
 
+<p>
 Say the subtotal is $100 and the items on the bill are $5, $25, $60, and $10. 
 Enter <b>100:5</b> and have the person who ordered the $5 item spin the spinner.
 If it comes up green (a 5% chance) they get to pay the whole bill! 
@@ -220,6 +236,15 @@ Pretty slick!
 Speaking of tips, you can minimize the hassle by starting with the most expensive items.
 Then you don't have to figure out who most of the items belong to.
 Oh, and if 3 people split the $10 pickled monkey balls just treat it as 3 items, $10/3 each (expressions instead of numbers are allowed).
-  
+</p>
+
+<p>
+Check out 
+<a href="http://messymatters.com/expectorant" title="Stochastic, Nerdtastic Restaurant Bill Splitting on Danny and Sharad's old Messy Matters blog">the original blog post</a>
+for more.
+</p>
+
 </details>
+
+</body>
 </html>
