@@ -102,6 +102,29 @@ function parsefrac(s) {
   return x === null ? NaN : x;
 }
 
+// OpenAI's Codex converted this from Java for us, mostly correctly...
+// Macro-expand the syntactic sugar with `@` and `:`, namely:
+//  * convert "t@a,b" to "((t)-(a))/((b)-(a))"
+//  * convert "s:a,b,c" (any # of comma-separated items) to "(c)/((s)-(a)-(b))"
+function desugar(s) {
+  // "x @ a,b" -- x and a and b can be expressions
+  if (s.match(/^[^@,:]+@[^@,:]+,[^@,:]+$/))
+    s = s.replace(/^\s*([^@,]+)\s*@\s*([^,]+),([^,]+)\s*$/,
+                  '(($1)-($2))/((($3)-($2)))')
+  // "s : a,b,c,..." -- for dinner bill splitting
+  else if (s.match(/^[^:,]+:[^:]+$/)) {
+    const ss = s.split(/[:,]/)
+    const n = ss.length
+    s = '('+ss[n-1]+')/(('+ss[0]+')'
+    if (n >= 3) {
+      for (let i = 1; i <= n-3; i++) s += '-('+ss[i]+')'
+      s += '-(' + ss[n-2] + ')'
+    }
+    s += ')'
+  }
+  return s
+}
+
 $(document).ready(function(){
   // configure the spinner
   var slots = spinner.compute2Slots(0.5);
@@ -125,65 +148,19 @@ $(document).ready(function(){
     // each time the prob changes, update the spinner
     try {
       // Convert the expression to a prob
-      const prob = parsefrac(e.target.value);
-      $("#prob").html(prob);
+      const prob = parsefrac(desugar(e.target.value))
+      $("#prob").html(prob)
       
       // Set the spinner as needed
-      if (isNaN(prob)) {
-        return;
-      }
-      var slots = spinner.compute2Slots(Number(prob));
-      spinner.update(s, slots);
+      if (isNaN(prob)) { return }
+      const slots = spinner.compute2Slots(Number(prob))
+      spinner.update(s, slots)
     } catch (error) {
-      spinner.setNan(s);
+      spinner.setNan(s)
     }
-  });
+  })
   
-});
-
-/*
-// -----------------------------------------------------------------------------
-// Macro-expand the syntactic sugar with `@` and `:`, namely:
-//  * convert "t@a,b" to "((t)-(a))/((b)-(a))"
-//  * convert "s:a,b,c" (any # of comma-separated items) to "(c)/((s)-(a)-(b))"
-function desugar(s) {
-  // "t @ a,b" -- t and a and b can be expressions
-  if (/^[^\@\,\:]+\@[^\@\,\:]+\,[^\@\,\:]+$/.test(s)) {
-    s = s.replace(
-          "^\\s*([^\\@\\,]+)\\s*\\@\\s*([^\\,]+)\\,([^\\,]+)\\s*$",
-          "(($1)-($2))/(($3)-($2))");
-    // "s : a,b,c,..." -- for dinner bill splitting
-  } else if (s.matches("^[^\\:\\,]+\\:[^\\:]+$")) {
-    let ss = s.split("[\\:\\,]")
-    int n = ss.length
-    s = "("+ss[n-1]+")/(("+ss[0]+")"
-    if(n >= 3) {
-      for(int i = 1; i <= n-3; i++) s += "-("+ss[i]+")"
-      s += "-(" + ss[n-2] + ")"
-    }
-    s += ")"
-  }
-  return s
-}
-
-  if(s.matches("^[^\\@\\,\\:]+\\@[^\\@\\,\\:]+\\,[^\\@\\,\\:]+$"))
-    s = s.replaceFirst(
-          "^\\s*([^\\@\\,]+)\\s*\\@\\s*([^\\,]+)\\,([^\\,]+)\\s*$",
-          "(($1)-($2))/(($3)-($2))");
-    // "s : a,b,c,..." -- for dinner bill splitting
-    else if(s.matches("^[^\\:\\,]+\\:[^\\:]+$")) {
-      let ss = s.split("[\\:\\,]")
-      let n = ss.length
-      s = "("+ss[n-1]+")/(("+ss[0]+")";
-      if (n >= 3) {
-        for (let i = 1; i <= n-3; i++) s += "-("+ss[i]+")";
-        s += "-(" + ss[n-2] + ")";
-      }
-      s += ")"
-    }
-  return s
-}
-*/
+})
 
 </script>
   
