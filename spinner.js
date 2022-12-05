@@ -54,6 +54,30 @@ function computeRotation(duration, startTime, startSpeed, currentTime) {
     return -(startSpeed / (2.5*duration)) * (t-duration)**2 + startSpeed * duration / 2.5;
 }
 
+/* The following function gives distance as a function of time, x, such that the
+distance is A when x=0 and is B when x=T:
+
+((A-B)*x^2 - 2(A-B)*T*x + A*T^2) / T^2
+
+The initial speed for that distance function is 
+
+2*(B-A)/T
+
+But the following may be more suspenseful, with the spinner asymptotically 
+coming to rest but never quite doing so, until the movement is imperceptible.
+
+B + (A-B)*(B*e/(B-A))^(x/T)
+
+where e>0 is a parameter giving the tolerance -- something like 0.01 -- for how
+close to B the distance function gets by time T. In other words, e is like the
+tolerance on what counts as stopped.
+
+For that function, the initial speed is 
+
+log(B*e/(B-A)) * (A-B) / T
+
+*/
+
 function computeTimeFromRotation(duration, startSpeed, rotation) {
     return 2.5*rotation / startSpeed;
 }
