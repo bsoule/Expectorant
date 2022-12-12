@@ -38,17 +38,6 @@ input {
 #prob    { color: #999999; }
 #probpre { color: #999999; }
 
-#expectogrid td {
-  border: 1px solid #999999;
-  padding: 8px;
-  text-align: center;
-}
-
-/* #expectogrid td:nth-child(even) { background-color: #f2f2f2; } */
-/* #expectogrid tr:nth-child(even) { background-color: #f2f2f2; } */
-
-#expectogrid td:hover { background-color: #dddddd; }
-
 .content {
   display: flex;
   flex-direction: column;

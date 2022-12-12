@@ -1,3 +1,5 @@
+// No idea what this file is about; probably just kill it
+
 window.requestAnimFrame = (function(){
   return window.requestAnimationFrame       ||
          window.webkitRequestAnimationFrame ||

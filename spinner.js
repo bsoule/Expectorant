@@ -1,18 +1,15 @@
-
 // Shortcut to get the best animationFrame function
 window.requestAnimFrame = (function(){
-    return  window.requestAnimationFrame       ||
-        window.webkitRequestAnimationFrame ||
-        window.mozRequestAnimationFrame    ||
-        function(callback){window.setTimeout(callback, 1000 / 60);};
+  return  window.requestAnimationFrame       ||
+          window.webkitRequestAnimationFrame ||
+          window.mozRequestAnimationFrame    ||
+          function(callback){window.setTimeout(callback, 1000 / 60)}
 })();
 
 // Keeps dregrees within 0-360
 function filter_degree(d) {
-	while (d<0){
-		d += 360;
-	}
-	return (d%360);
+  const rem = d % 360 // Javascript's % operator is not mod but remainder :(
+  return rem >= 0 ? rem : rem + 360
 }
 
 // Converts Polar to Cartesian coordinates
