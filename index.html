@@ -79,7 +79,9 @@ $(document).ready(() => {
     spinner.redraw(s)
     // Start the spinner and have it land on slice 0 with probability p
     const p = Number($("#prob").html())
-    spinner.start(s, spinpick([0, 1], [p, 1-p]))
+    const target = spinpick([0, 1], [p, 1-p])
+    console.log(`DEBUG: it's gonna land on ${target === 0 ? 'YES' : 'NO'}`)
+    spinner.start(s, target)
   })
 
   // Configure what happens when the input field changes
