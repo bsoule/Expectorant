@@ -23,6 +23,13 @@ function spinHelper(p, w) {
 // Eg, spinpick(["a","b","c"], [1,2,1]) returns "a" w/ p=.25, "b" w/ p=.5 etc
 function spinpick(l, w) { return l[spinHelper(Math.random(), w)] }
 
+/* Testing spinpick -- seems rock solid for lots of sample probabilities
+sum = 0;
+p = .123;
+for (let i=0; i<1e7; i++) { sum += spinpick([0,1], [p, 1-p]) }
+1 - sum/1e7 // should match p pretty closely
+*/
+
 // Eval but just return null if syntax error.
 // Obviously don't use serverside with user-supplied input.
 function laxeval(s) {

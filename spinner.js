@@ -264,7 +264,7 @@ function spinner(div, slots) {
     rand_speed: 0,
     duration: 0,
     winner: -1,
-    startTime: (new Date()).getTime()
+    startTime: (new Date()).getTime(),
   }
 
   updateSpinner(spin, slots)
@@ -288,6 +288,6 @@ window.spinner = {
   start: spin_start,
   compute2Slots: compute2Slots,
   update: updateSpinner,
-  setNan: setSpinnerNaN,
-  redraw: redrawSpinner
+  setNaN: setSpinnerNaN,
+  redraw: redrawSpinner,
 }
