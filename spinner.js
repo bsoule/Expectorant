@@ -87,7 +87,7 @@ function computeSpeed(duration, startTime, startSpeed, currentTime) {
 
 
 // Executes the animation frame using css
-var spin_anim = function(spin) {
+let spin_anim = function(spin) {
   if (spin.speed < 0.01) {
     setTimeout(spin_stop(spin), 0)
     return true
