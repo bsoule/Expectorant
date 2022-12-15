@@ -47,7 +47,6 @@ function parsefrac(s) {
   return x === null ? NaN : x
 }
 
-// OpenAI's Codex converted this from Java for us, mostly correctly...
 // Macro-expand the syntactic sugar with `@` and `:`, namely:
 //  * convert "t@a,b" to "((t)-(a))/((b)-(a))"
 //  * convert "s:a,b,c" (any # of comma-separated items) to "(c)/((s)-(a)-(b))"

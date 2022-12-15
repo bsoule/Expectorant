@@ -1,92 +1,121 @@
+const CLOG = console.log // convenience function
+
 // Shortcut to get the best animationFrame function
 window.requestAnimFrame = (function(){
   return  window.requestAnimationFrame       ||
           window.webkitRequestAnimationFrame ||
           window.mozRequestAnimationFrame    ||
-          function(callback){window.setTimeout(callback, 1000 / 60)}
+          function(callback) { window.setTimeout(callback, 1000 / 60) }
 })()
 
-// Keeps dregrees within 0-360
+// Keep degrees in [0, 360)
 function filter_degree(d) {
   const rem = d % 360 // Javascript's % operator is not mod but remainder :(
   return rem >= 0 ? rem : rem + 360
 }
 
-// Converts Polar to Cartesian coordinates
+// Convert Polar to Cartesian coordinates
 function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
   const angleInRadians = (angleInDegrees-90) * Math.PI / 180.0
   return {
     x: centerX + (radius * Math.cos(angleInRadians)),
-    y: centerY + (radius * Math.sin(angleInRadians))
+    y: centerY + (radius * Math.sin(angleInRadians)),
   }
 }
 
-// Draws a pie slice that is one section of the spinner
+// Draw a pie slice that is one section of the spinner
 function arcPath(x, y, radius, endradius, startAngle, endAngle) {
-  const start = polarToCartesian(x, y, radius, endAngle)
-  const end = polarToCartesian(x, y, radius, startAngle)
+  const start  = polarToCartesian(x, y, radius, endAngle)
+  const end    = polarToCartesian(x, y, radius, startAngle)
   const start2 = polarToCartesian(x, y, endradius, endAngle)
-  const end2 = polarToCartesian(x, y, endradius, startAngle)
+  const end2   = polarToCartesian(x, y, endradius, startAngle)
   const largeArcFlag = endAngle - startAngle <= 180 ? "0" : "1"
   const d = [
     "M", start.x, start.y, 
     "A", radius, radius, 0, largeArcFlag, 0, end.x, end.y,
     "L", end2.x, end2.y,
     "A", endradius, endradius, 0, largeArcFlag, 1, start2.x, start2.y,
-    "Z"
+    "Z",
   ].join(" ")
   return d
 }
 
+/* 
+The following describes motion as a function of time, t, such that the
+distance is 0 when t=0 and is B when t=T:
+
+DIST:      (2*T*t - t^2) * B/T^2
+SPEED:     2*B*(T-t)/T^2
+INITSPEED: 2*B/T          (that's twice the average speed of B/T)
+
+In other words, the speed drops linearly over an amount of time T covering a 
+distance B. That's what a projectile thrown in the air does as it comes to a 
+stop at the apex due to gravity.
+
+But the following may be more suspenseful, with the spinner asymptotically 
+coming to rest but never quite doing so, until the movement is imperceptible:
+
+DIST:      B*(1 - d^(t/T))
+SPEED:     -B/T * log(d) * d^(t/T)
+INITSPEED: -B * log(d) / T
+
+where d>0 is a parameter giving the tolerance -- something like 0.01 -- for how
+close to B the distance function gets by time T. In other words, d is like the
+tolerance on what counts as stopped.
+
+
+And for posterity, here's a sine-based easing function we found on the internet
+but it's pretty annoying to work with:
+
+function computeRotation(duration, startTime, startSpeed, currentTime) {
+  const t = currentTime - startTime
+  return startSpeed * 
+    (2*duration*Math.cos((Math.PI*t)/(2*duration))/Math.PI + duration + t) - 
+      startSpeed * duration * (2/Math.PI + 1)
+}
+
+function computeSpeed(duration, startTime, startSpeed, currentTime) {
+  const t = currentTime - startTime
+  return -Math.cos((1 - t/duration) * Math.PI/2)*startSpeed + startSpeed
+}
+*/
+
+// Stop a tiny bit before the real target so it snaps into place?
 function computeTotalRotation(duration, startTime, startSpeed) {
   const currentTime = startTime + duration - 0.01
   return computeRotation(duration, startTime, startSpeed, currentTime)
 }
 
+// Compute rotation as a function of current time
 function computeRotation(duration, startTime, startSpeed, currentTime) {
   const t = currentTime - startTime
-  // Old version that used a sine-based easing function.
-  //return startSpeed * (2*duration*Math.cos((Math.PI*t)/(2*duration))/Math.PI + duration + t) - startSpeed * duration * (2/Math.PI + 1);
-  return -startSpeed/(2.5*duration) * (t-duration)**2 + startSpeed*duration/2.5
+  return -startSpeed/(2.5*duration)*(t-duration)**2 + startSpeed*duration/2.5
+  const T = duration
+  const B = startSpeed*T/2 // implies startSpeed = 2*B/T
+  return (2*T*t - t**2) * B/T**2
+  // ORIG: -startSpeed/(2.5*duration)*(t-duration)**2 + startSpeed*duration/2.5
 }
 
-/* The following function gives distance as a function of time, x, such that the
-distance is A when x=0 and is B when x=T:
-
-((A-B)*x^2 - 2(A-B)*T*x + A*T^2) / T^2
-
-The initial speed for that distance function is 
-
-2*(B-A)/T
-
-But the following may be more suspenseful, with the spinner asymptotically 
-coming to rest but never quite doing so, until the movement is imperceptible.
-
-B + (A-B)*(B*e/(B-A))^(x/T)
-
-where e>0 is a parameter giving the tolerance -- something like 0.01 -- for how
-close to B the distance function gets by time T. In other words, e is like the
-tolerance on what counts as stopped.
-
-For that function, the initial speed is 
-
-log(B*e/(B-A)) * (A-B) / T
-
-*/
-
+// I'm confused; time as a function of distance should be messier than this...
 function computeTimeFromRotation(duration, startSpeed, rotation) {
   return 2.5*rotation / startSpeed
+  const T = duration
+  const B = startSpeed*T/2
+  return T + T/B*Math.sqrt(B*(B-rotation))
+  // ORIG: 2.5*rotation / startSpeed
 }
 
-
+// Derivative of the distance function
 function computeSpeed(duration, startTime, startSpeed, currentTime) {
   const t = currentTime - startTime
-  //return -Math.cos((1 - t/duration) * Math.PI/2)*startSpeed + startSpeed
   return 0.8 * startSpeed * (duration - t) / duration
+  const T = duration
+  const B = startSpeed*T/2
+  return 2*B*(T-t)/T**2
+  // ORIG: 0.8 * startSpeed * (duration - t) / duration
 }
 
-
-// Executes the animation frame using css
+// Execute the animation frame using css
 let spin_anim = function(spin) {
   if (spin.speed < 0.01) {
     setTimeout(spin_stop(spin), 0)
@@ -95,27 +124,27 @@ let spin_anim = function(spin) {
   const t = (new Date()).getTime()
   spin.speed = computeSpeed(spin.duration, spin.startTime, spin.spinSpeed, t)
   // the spin is being eased, but what we want is the current location
-  spin.degree = computeRotation(spin.duration, spin.startTime, spin.spinSpeed,t)
+  spin.degree = computeRotation(spin.duration, spin.startTime,spin.spinSpeed,t)
 	spin.degree = filter_degree(spin.degree)
-	spin.obj.css('transform', 'rotate(-' + spin.degree + 'deg)')
+	spin.obj.css('transform', `rotate(-${spin.degree}deg)`)
   // curry this.
   const sa = () => { spin_anim(spin) }
 	requestAnimFrame(sa)
 }
 
-// Starts the Spinner
-// spin is the spin object, winner is the index for the slot that wins.
+// Start the spinner
+// spin is the spin object, winner is the index of the slot that will win.
 function spin_start(spin, winner) {
   // Reset to zero
   spin.degree = 0
   spin.winner = winner
-  spin.obj.css('transform', 'rotate(-' + spin.degree + 'deg)')
+  spin.obj.css('transform', `rotate(-${spin.degree}deg)`)
   spin.startTime = (new Date()).getTime()
   // start the spinner
 	spin.rand_speed = Math.random()
   spin.speed = spin.spinSpeed
   spin.duration = spin.min_duration + 
-    (spin.max_duration-spin.min_duration) * spin.rand_speed
+    (spin.max_duration - spin.min_duration) * spin.rand_speed
 
   // Compute the total rotation, and figure out if it is landing on the winner.
   // If not, adjust the duration so that we do land on the winner by 
@@ -123,14 +152,14 @@ function spin_start(spin, winner) {
   // updating the duration to match.
 
   // 1 - Figure out the min and max angle/rotation for the winner
-  console.log(
-    `DEBUG: winner = ${winner} (0-based) of ${spin.slots.length} slots`)
+  //console.log(
+  //  `DEBUG: winner = ${winner} (0-based) of ${spin.slots.length} slots`)
   const win = spin.slots[winner] //start/endAngle.
-  // 2 - compute the rotation angles for the given duration
+  // 2 - Compute the rotation angles for the given duration
   const rotationTot = 
     computeTotalRotation(spin.duration, spin.startTime, spin.spinSpeed)
   const oneRot = filter_degree(rotationTot)
-  // 3 - figure out if we're already there, or if we need to move things around?
+  // 3 - Figure out if we're already there, or if we need to move things around
   if (oneRot < win.startAngle || oneRot > win.endAngle) {
     // not inside the winner, so determine how much more we need by finding
     // a random value between start and end
@@ -140,7 +169,8 @@ function spin_start(spin, winner) {
     // rotationTot instead
     const newTot = rotationTot + (ranAngle - oneRot)
     // newTot should now be valid, so we need to compute a duration that can 
-    // get us to this total
+    // get us to this total.
+    // Hmm, but shouldn't duration always be the length of the sound clip?
     const newTime = 
       computeTimeFromRotation(spin.duration, spin.spinSpeed, newTot)
     spin.duration = newTime
@@ -148,13 +178,14 @@ function spin_start(spin, winner) {
 	spin_anim(spin)
 }
 
-// Stops the Spinner
+// Stop the spinner
 function spin_stop(spin) {
   // compute where it is supposed to be and snap it there
   // this shouldn't be more than a degree or two off from the animation.
-  const rotationTot = computeTotalRotation(spin.duration, spin.startTime, spin.spinSpeed)
-  spin.degree = filter_degree(rotationTot);
-  spin.obj.css('transform', 'rotate(-' + spin.degree + 'deg)');
+  const rotationTot = 
+    computeTotalRotation(spin.duration, spin.startTime, spin.spinSpeed)
+  spin.degree = filter_degree(rotationTot)
+  spin.obj.css('transform', `rotate(-${spin.degree}deg)`);
   // The winner is the index of the slot that wins, so we want to figure out
   // what slot that is, and draw a new outline pie over it to show that's the 
   // winner!
@@ -166,8 +197,10 @@ function spin_stop(spin) {
   const startAngle = 0
   let svg = spin.obj.html()
   const win = spin.slots[spin.winner]
-  svg += '<path d="' + arcPath(50,50, 5, 50, (win.startAngle), (win.endAngle)) +
-    '" fill="#00000000" stroke="#ffffff" stroke-width="2" />'
+  svg += `<path d="${arcPath(50,50, 5, 50, win.startAngle, win.endAngle)}"\
+                fill="#00000000" \
+                stroke="#ffffff" \
+                stroke-width="2" />`
   spin.obj.html(svg)
 }
 
@@ -193,7 +226,7 @@ function redrawSpinner(spin) {
     // we are in the special case of one item has full probability (360 deg)
     // then we have to opt out of the arc and draw a circle.
     svg += 
-      '<circle cx="50" cy="50" r="50" fill="' + spin.slots[iAtOne].color+'"/>' +
+      '<circle cx="50" cy="50" r="50" fill="'+spin.slots[iAtOne].color+'"/>' +
       '<circle cx="50" cy="50" r="5" fill="white"/>'
     const t = polarToCartesian(50, 50, textOffset, 0)
     svg += '<text font-size="10" x="' + t.x + '" y="' + t.y + 
@@ -215,7 +248,7 @@ function redrawSpinner(spin) {
     const endAngle = startAngle + 360*normals[i]
     spin.slots[i]["startAngle"] = startAngle
     spin.slots[i]["endAngle"] = endAngle
-    svg += '<path d="' + arcPath(50,50, 5, 50, (startAngle), (endAngle)) + 
+    svg += '<path d="' + arcPath(50,50, 5, 50, startAngle, endAngle) + 
       '" fill="' + spin.slots[i].color + 
       '" stroke="#ffffff" stroke-width="0" />'
     startAngle = endAngle
@@ -228,12 +261,12 @@ function redrawSpinner(spin) {
     const t = polarToCartesian(50, 50, textOffset, midAngle)
     svg += '<text font-size="6" x="' + t.x + '" y="' + t.y + 
       '" fill="#000000" font-style="bold" font-family="Arial" alignment-baseline="central" text-anchor="middle" transform="rotate(' + 
-      (midAngle) + ' ' + t.x + ',' + t.y + 
+      midAngle + ' ' + t.x + ',' + t.y + 
       ')" stroke="#000000" stroke-width="1" opacity="0.3">' + 
       spin.slots[i].value + '</text>'
     svg += '<text font-size="6" x="' + t.x + '" y="' + t.y + 
       '" fill="#ffffff" font-style="bold" font-family="Arial" alignment-baseline="central" text-anchor="middle" transform="rotate(' + 
-      (midAngle) + ' ' + t.x + ',' + t.y + ')">' + 
+      midAngle + ' ' + t.x + ',' + t.y + ')">' + 
       spin.slots[i].value + '</text>'
     startAngle = endAngle
   }

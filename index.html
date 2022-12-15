@@ -41,7 +41,7 @@
 <div class="wrapper">
 <div class="content" role="main">
 
-<h1>Expectorant <span style="color:gray; font-size: 9px;">v2022.12.12c</span></h1>
+<h1>Expectorant <span style="color:gray; font-size: 9px;">v2022.12.14b</span></h1>
 
 <p>
 <input id="expr" type="text" size="38" placeholder="Expression that evaluates to a probability" />
@@ -56,8 +56,8 @@
 <audio id="audiotag1" src="https://cdn.glitch.global/e605b8ff-1b81-42a6-81a5-17eabcdd19d1/beepboop.wav?v=1666556484855" preload="auto"></audio>
 </p>
 
-</div> <!-- main -->
-</div> <!-- wrapper -->
+</div> <!-- end main -->
+</div> <!-- end wrapper -->
 
 <div class="spin_container">
   <div id="my-spinner" class="spin_wrapper"></div>
@@ -65,46 +65,47 @@
 
 <script>
 
-$(document).ready(() => {
-  // Initialize the spinner
-  const INITPROB = .5
-  $("#prob").html(INITPROB)
-  const slots = spinner.compute2Slots(INITPROB)
-  const s = spinner.create($('#my-spinner'), slots)
-  
-  // Configure button event
-  $('#expectorize').click(e => {
-    e.preventDefault()
-    document.getElementById("audiotag1").play()
-    spinner.redraw(s)
-    // Start the spinner and have it land on slice 0 with probability p
-    const p = Number($("#prob").html())
-    const target = spinpick([0, 1], [p, 1-p])
-    console.log(`DEBUG: it's gonna land on ${target === 0 ? 'YES' : 'NO'}`)
-    spinner.start(s, target)
-  })
+const INITPROB = .5
 
-  // Configure what happens when the input field changes
-  $('#expr').on("input propertychange", e => {
-    // Each time the probability changes, update the spinner
-    try {
-      // Parse and evaluate the expression to get a probability
-      const prob = parsefrac(desugar(e.target.value))
-      $("#prob").html(prob)
-      
-      // Set the spinner as needed
-      if (isNaN(prob)) { 
-        spinner.setNaN(s)
-        return 
-      }
-      const slots = spinner.compute2Slots(Number(prob))
-      spinner.update(s, slots)
-    } catch (error) {
-      spinner.setNaN(s)
-    }
-  })
-  
+$(document).ready(() => {
+
+$("#prob").html(INITPROB)
+const slots = spinner.compute2Slots(INITPROB)
+const spinz = spinner.create($('#my-spinner'), slots)
+
+// Configure button event
+$('#expectorize').click(e => {
+  e.preventDefault()
+  document.getElementById("audiotag1").play()
+  spinner.redraw(spinz)
+  // Start the spinner and have it land on slice 0 with probability p
+  const p = Number($("#prob").html())
+  const target = spinpick([0, 1], [p, 1-p])
+  CLOG(`DEBUG: it's gonna land on ${target === 0 ? 'YES' : 'NO'}`)
+  spinner.start(spinz, target)
 })
+
+// Configure what happens when the input field changes (update the spinner)
+$('#expr').on("input propertychange", e => {
+  try {
+    const p = parsefrac(desugar(e.target.value))
+    if (isNaN(p)) { 
+      spinner.setNaN(spinz)
+      $("#prob").html('NaN') // maybe a '?' would be more normie-friendly?
+      return 
+    } else {
+      $("#prob").html(p) // the parsed probability in gray
+      const slots = spinner.compute2Slots(Number(p))
+      spinner.update(spinz, slots)
+    }
+  } catch (error) {
+    console.log(`DEBUG: I haven't found a way to ever reach this code`)
+    spinner.setNaN(spinz)
+    $("#prob").html("NaN")
+  }
+})
+
+}) // end document-ready
 
 </script>
 
