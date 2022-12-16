@@ -1,3 +1,22 @@
+/* Here we have some utility functions for doing the math of spinning a 
+spinner. That's the spinpick function for randomly choosing from a list of 
+things with corresponding weights, which we normalize to probabilities.
+
+Also we have the business logic for two use cases for expectorant:
+
+1. Computing probabilities for restaurant bill splitting based on the subtotal
+and amounts for things people ordered.
+2. When you owe someone some inconvenient amount of money like $7.52 and you
+want the probabilities that you should pay them one of two convenient amounts
+like $5 and $20. (Answer: pay $5 with 83% probability and $20 with 17%.)
+
+That's done in the desugar function, which turns our syntactic sugar with ':'
+and '@' into arithmetic expressions that evaluate to probabilities.
+
+Finally, we have the parsefrac function for doing that evaluation and getting
+an actual number. */
+// -----------------------------------------------------------------------------
+
 // Renormalize a list of weights to sum to 1
 function renorm(w) {
   const tot = w.reduce((a,b)=>a+b)
@@ -68,5 +87,3 @@ function desugar(s) {
   }
   return s
 }
-
-// -----------------------------------------------------------------------------

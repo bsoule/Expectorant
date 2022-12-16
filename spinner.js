@@ -8,11 +8,9 @@ window.requestAnimFrame = (function(){
           function(callback) { window.setTimeout(callback, 1000 / 60) }
 })()
 
-// Keep degrees in [0, 360)
-function filter_degree(d) {
-  const rem = d % 360 // Javascript's % operator is not mod but remainder :(
-  return rem >= 0 ? rem : rem + 360
-}
+// Javascript's % operator is not actually mod but remainder so we have to
+// force it to be positive. We use this to keep degrees in [0, 360).
+function mod(x, m) { return (x % m + m) % m }
 
 // Convert Polar to Cartesian coordinates
 function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
@@ -121,11 +119,11 @@ let spin_anim = function(spin) {
     setTimeout(spin_stop(spin), 0)
     return true
   }
-  const t = (new Date()).getTime()
+  const t = Date.now()
   spin.speed = computeSpeed(spin.duration, spin.startTime, spin.spinSpeed, t)
   // the spin is being eased, but what we want is the current location
   spin.degree = computeRotation(spin.duration, spin.startTime,spin.spinSpeed,t)
-	spin.degree = filter_degree(spin.degree)
+	spin.degree = mod(spin.degree, 360)
 	spin.obj.css('transform', `rotate(-${spin.degree}deg)`)
   // curry this.
   const sa = () => { spin_anim(spin) }
@@ -139,7 +137,7 @@ function spin_start(spin, winner) {
   spin.degree = 0
   spin.winner = winner
   spin.obj.css('transform', `rotate(-${spin.degree}deg)`)
-  spin.startTime = (new Date()).getTime()
+  spin.startTime = Date.now()
   // start the spinner
 	spin.rand_speed = Math.random()
   spin.speed = spin.spinSpeed
@@ -152,13 +150,11 @@ function spin_start(spin, winner) {
   // updating the duration to match.
 
   // 1 - Figure out the min and max angle/rotation for the winner
-  //console.log(
-  //  `DEBUG: winner = ${winner} (0-based) of ${spin.slots.length} slots`)
   const win = spin.slots[winner] //start/endAngle.
   // 2 - Compute the rotation angles for the given duration
   const rotationTot = 
     computeTotalRotation(spin.duration, spin.startTime, spin.spinSpeed)
-  const oneRot = filter_degree(rotationTot)
+  const oneRot = mod(rotationTot, 360)
   // 3 - Figure out if we're already there, or if we need to move things around
   if (oneRot < win.startAngle || oneRot > win.endAngle) {
     // not inside the winner, so determine how much more we need by finding
@@ -184,7 +180,7 @@ function spin_stop(spin) {
   // this shouldn't be more than a degree or two off from the animation.
   const rotationTot = 
     computeTotalRotation(spin.duration, spin.startTime, spin.spinSpeed)
-  spin.degree = filter_degree(rotationTot)
+  spin.degree = mod(rotationTot, 360)
   spin.obj.css('transform', `rotate(-${spin.degree}deg)`);
   // The winner is the index of the slot that wins, so we want to figure out
   // what slot that is, and draw a new outline pie over it to show that's the 
@@ -288,16 +284,21 @@ function spinner(div, slots) {
   // generate the spin object
   const spin = {
     slots: slots,
+    obj: div.children("svg"),
+    winner: -1,
+    startTime: Date.now(), // initial time
+    
     speed: 0,
     spinSpeed: 1,
     degree: 0,
-    obj: div.children("svg"),
     min_duration: 3000,
     max_duration: 5000,
     rand_speed: 0,
     duration: 0,
-    winner: -1,
-    startTime: (new Date()).getTime(),
+
+    // trying a new thing here with fixed duration and only tracking position
+    //dur: 4500, // total duration of the spin
+    //pos: 0, 
   }
 
   updateSpinner(spin, slots)
