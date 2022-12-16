@@ -20,17 +20,13 @@
 
 <link rel="stylesheet" href="/style.css" />
 
-<!-- not using D3 currently
-<script src="https://d3js.org/d3.v7.min.js"></script>
--->
-
-<!-- for the spinner! -->
+<!-- Using jQuery for the spinner currently -->
 <script src="https://code.jquery.com/jquery-3.6.1.min.js"
   integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" 
   crossorigin="anonymous"></script>
-<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js" 
+<!-- <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js" 
   integrity="sha256-lSjKY0/srUM9BE3dPm+c4fBo1dky2v27Gdjm2uoZaL0=" 
-  crossorigin="anonymous"></script>
+  crossorigin="anonymous"></script> -->
 <link rel="stylesheet" href="spinner.css" />
 <script src="spinner.js"></script>
 <script src="expectorant.js"></script>
@@ -92,14 +88,13 @@ $('#expr').on("input propertychange", e => {
     if (isNaN(p)) { 
       spinner.setNaN(spinz)
       $("#prob").html('NaN') // maybe a '?' would be more normie-friendly?
-      return 
     } else {
       $("#prob").html(p) // the parsed probability in gray
       const slots = spinner.compute2Slots(Number(p))
       spinner.update(spinz, slots)
     }
   } catch (error) {
-    console.log(`DEBUG: I haven't found a way to ever reach this code`)
+    CLOG(`DEBUG: I haven't found a way to ever reach this code`)
     spinner.setNaN(spinz)
     $("#prob").html("NaN")
   }

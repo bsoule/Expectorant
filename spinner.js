@@ -216,7 +216,7 @@ function redrawSpinner(spin) {
   let svg = ''
   // check to see if one of the normals is at 1, if it is we want to draw the 
   // special case for just that index (i).
-  const iAtOne = normals.findIndex((i) => i == 1)
+  const iAtOne = normals.findIndex(i => i == 1)
   if (iAtOne > -1) {
     // we are drawing wedges with arcs, and arcs can't draw full circles, so if
     // we are in the special case of one item has full probability (360 deg)
