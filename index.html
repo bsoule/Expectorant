@@ -37,7 +37,7 @@
 <div class="wrapper">
 <div class="content" role="main">
 
-<h1>Expectorant <span style="color:gray; font-size: 9px;">v2022.12.17a</span></h1>
+<h1>Expectorant <span style="color:gray; font-size: 9px;">v2022.12.17c</span></h1>
 
 <p>
 <input id="expr" type="text" size="38" placeholder="Expression that evaluates to a probability" />
@@ -49,7 +49,11 @@
   </button>
 </center>
 
-<audio id="audiotag1" src="https://cdn.glitch.global/e605b8ff-1b81-42a6-81a5-17eabcdd19d1/beepboop.wav?v=1666556484855" preload="auto"></audio>
+<!-- https://cdn.glitch.global/e605b8ff-1b81-42a6-81a5-17eabcdd19d1/beepboop.wav?v=1666556484855 -->
+<audio id="audiotag1" 
+  src="https://expectorant.dreev.repl.co/sound/god-machine-4.wav" 
+  preload="auto">
+</audio>
 </p>
 
 </div> <!-- end main -->
@@ -75,9 +79,10 @@ $('#expectorize').click(e => {
   document.getElementById("audiotag1").play()
   spinner.redraw(spinz)
   // Start the spinner and have it land on slice 0 with probability p
-  const p = Number($("#prob").html())
+  const p = Number($("#prob").html()) || 0  // default to 0 if it doesn't parse
   const target = spinpick([0, 1], [p, 1-p])
-  CLOG(`DEBUG: it's gonna land on ${target === 0 ? 'YES' : 'NO'}`)
+  CLOG(`DEBUG: ` + 
+    `p=${p} and it's gonna land on slot ${target} ie ${['YES', 'NO'][target]}`)
   spinner.start(spinz, target)
 })
 
@@ -90,11 +95,11 @@ $('#expr').on("input propertychange", e => {
       $("#prob").html('NaN') // maybe a '?' would be more normie-friendly?
     } else {
       $("#prob").html(p) // the parsed probability in gray
-      const slots = spinner.compute2Slots(Number(p))
+      const slots = spinner.compute2Slots(p)
       spinner.update(spinz, slots)
     }
   } catch (error) {
-    CLOG(`DEBUG: I haven't found a way to ever reach this code`)
+    CLOG("Oh hi, I haven't found a way to ever reach this code. Did you?")
     spinner.setNaN(spinz)
     $("#prob").html("NaN")
   }
