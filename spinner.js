@@ -189,15 +189,13 @@ function spin_stop(spin) {
   CLOG(`DEBUG: spin_stop: p=${p}, a=${a}, b=${b}`)
   if (p > 1-1e-5) { a = 0; b = 360 - 1e-5 }
   spin.obj.innerHTML += `<path d="${arcPath(50,50, 5, 50, a, b)}" ` +
-                              `fill="#00000000" ` +
-                              `stroke="white" ` +
-                              `stroke-width="2" />`
+                           `fill="#00000000" stroke="white" stroke-width="2" />`
 }
 
 function setSpinnerNaN(spin) {
   const slots = compute2Slots(1)
   slots[0].color = "black"
-  slots[0].value = "🍌" // could use a confused-emoji instead?
+  slots[0].value = "🍌"  // why a banana? idk, could use confused-emoji instead?
   updateSpinner(spin, slots)
 }
 
@@ -211,12 +209,15 @@ function fontblurb(x) {
 const alignblurb = 'alignment-baseline="central" text-anchor="middle" '
 const strokeblurb = 'stroke="#000000" stroke-width="1" opacity="0.3" '
 
-// Take start angle a and end angle b and the color, return blurb for wedge
-function arcblurb(a, b, color, p) { // TODO: also passing in probability p
+// Take start angle a, end angle b, the color, and the probability; return svg 
+// blurb for wedge
+function arcblurb(a, b, color, p) {
   CLOG(`DEBUG: arcblurb: a=${a}, b=${b}, color=${color}, p=${p}`)
   if (a === b && color === 'black') { a = 0; b = 360 - 1e-5 }
-  if (p > 1-1e-5) { a = 0; b = 360 - 1e-5 }
+  if (p > 1-1e-3) { a = 0; b = 360 - 1e-3 }
   return `<path d="${arcPath(50,50, 5,50, a, b)}" fill="${color}" />`
+  // We can just make an arc from 0 to almost-360 degrees so no need for this
+  // special case:
   // `<circle cx="50" cy="50" r="50" fill="${color}"/>` +
   // `<circle cx="50" cy="50" r="5"  fill="white"/>`
 }
