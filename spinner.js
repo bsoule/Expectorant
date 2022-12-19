@@ -1,5 +1,4 @@
 // -----------------------------------------------------------------------------
-const CLOG = console.log // convenience functions
 const max = Math.max
 const min = Math.min
 const abs = Math.abs
@@ -129,7 +128,8 @@ let spin_anim = function(spin) {
   // the spin is being eased, but what we want is the current location
   spin.degree = computeRotation(spin.duration, spin.startTime,spin.spinSpeed,t)
 	spin.degree = mod(spin.degree, 360)
-	spin.obj.css('transform', `rotate(-${spin.degree}deg)`)
+	//spin.obj.css('transform', `rotate(-${spin.degree}deg)`)
+  spin.obj.style.transform = `rotate(-${spin.degree}deg)`
   // curry this.
   const sa = () => { spin_anim(spin) }
 	requestAnimFrame(sa)
@@ -137,14 +137,12 @@ let spin_anim = function(spin) {
 
 // Take a spin object and the index of the slot destined to win, start spinning
 function spin_start(spin, winner) {
-  // this kludge should be fixed; let's just make it an assert (see d.glitch?)
-  if (isNaN(winner)) { // dumb kludge; why can winner be NaN? 
-    winner = 0
-    CLOG(`DEBUG: winner was undefined? slots=${JSON.stringify(spin.slots)}`)
-  }
+  ASSERT(winner >= 0 && winner < spin.slots.length, 
+    `Can't take slot ${winner} of ${JSON.stringify(spin.slots)}`)
   spin.degree = 0
   spin.winner = winner
-  spin.obj.css('transform', `rotate(-${spin.degree}deg)`)
+  //spin.obj.css('transform', `rotate(-${spin.degree}deg)`)
+  spin.obj.style.transform = `rotate(-${spin.degree}deg)`
   spin.startTime = Date.now()
 	spin.rand_speed = Math.random()
   spin.speed = spin.spinSpeed
@@ -187,7 +185,8 @@ function spin_stop(spin) {
   const rotationTot = 
     computeTotalRotation(spin.duration, spin.startTime, spin.spinSpeed)
   spin.degree = mod(rotationTot, 360)
-  spin.obj.css('transform', `rotate(-${spin.degree}deg)`);
+  //spin.obj.css('transform', `rotate(-${spin.degree}deg)`)
+  spin.obj.style.transform = `rotate(-${spin.degree}deg)`
   // Figure out the winning slot, draw new outline pie over it to show that it's
   // the winner!
 
@@ -196,12 +195,12 @@ function spin_stop(spin) {
   // const weights = renorm(spin.slots.map(i => i.weight))
   // const startAngle = 0
   const win = spin.slots[spin.winner]
-  const svg = spin.obj.html() + 
+  const svg = spin.obj.innerHTML + 
     `<path d="${arcPath(50,50, 5, 50, win.startAngle, win.endAngle)}" ` +
           `fill="#00000000" ` +
           `stroke="#ffffff" ` +
           `stroke-width="2" />`
-  spin.obj.html(svg)
+  spin.obj.innerHTML = svg
 }
 
 function setSpinnerNaN(spin) {
@@ -213,8 +212,9 @@ function setSpinnerNaN(spin) {
 
 // Take the weight (probability) of the pie slice and make the font blurb
 function fontblurb(x) {
-  const MAXF = 16 // biggest font size that looks good on the spinner
-  return `font-family="Arial" font-style="bold" font-size="${min(MAXF,x*100)}" `
+  const MAXF = 16            // biggest font size that looks good on the spinner
+  const fs = min(MAXF, x*100 - 1)    // 10% probability displayed at font size 9
+  return `font-family="Arial" font-style="bold" font-size="${fs}" `
 }
 
 const alignblurb = 'alignment-baseline="central" text-anchor="middle" '
@@ -276,7 +276,7 @@ function redrawSpinner(spin) {
       ang += degDelta
     }
   }
-  spin.obj.html(svg)
+  spin.obj.innerHTML = svg
 }
 
 function updateSpinner(spin, slots) {
@@ -285,14 +285,35 @@ function updateSpinner(spin, slots) {
   redrawSpinner(spin)
 }
 
+/* de-jQuerying:
+
+function foo(div) {
+  div.append('<svg xmlns="http://www.w3.org/2000/svg" class="spin" width="100%" height="100%" viewbox="0 0 100 100"></svg>')
+  return div.children('svg')
+}
+
+foo($('my-spinner'))
+
+->
+
+function foo(div) {
+  div.innerHTML += '<svg xmlns="http://www.w3.org/2000/svg" class="spin" width="100%" height="100%" viewbox="0 0 100 100"></svg>';
+  return div.querySelectorAll('svg');
+}
+
+const mySpinner = document.querySelector('#my-spinner');
+foo(mySpinner);
+
+*/
+
 function spinner(div, slots) {
   // create an svg directly in the div 
-  div.append('<svg xmlns="http://www.w3.org/2000/svg" class="spin" width="100%" height="100%" viewbox="0 0 100 100"></svg>')
+  div.innerHTML += '<svg xmlns="http://www.w3.org/2000/svg" class="spin" width="100%" height="100%" viewbox="0 0 100 100"></svg>'
 
   // generate the spin object
   const spin = {
     slots: slots,
-    obj: div.children("svg"),
+    obj: div.querySelector('svg'),
     winner: -1,
     startTime: Date.now(), // initial time
     

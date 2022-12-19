@@ -19,14 +19,6 @@
 <meta name="twitter:card" content="summary" />
 
 <link rel="stylesheet" href="/style.css" />
-
-<!-- Using jQuery for the spinner currently -->
-<script src="https://code.jquery.com/jquery-3.6.1.min.js"
-  integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" 
-  crossorigin="anonymous"></script>
-<!-- <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js" 
-  integrity="sha256-lSjKY0/srUM9BE3dPm+c4fBo1dky2v27Gdjm2uoZaL0=" 
-  crossorigin="anonymous"></script> -->
 <link rel="stylesheet" href="spinner.css" />
 <script src="expectorant.js"></script>
 <script src="spinner.js"></script>
@@ -37,7 +29,7 @@
 <div class="wrapper">
 <div class="content" role="main">
 
-<h1>Expectorant <span style="color:gray; font-size: 9px;">v2022.12.17c</span></h1>
+<h1>Expectorant <span style="color:gray; font-size: 9px;">v2022.12.18b</span></h1>
 
 <p>
 <input id="expr" type="text" size="38" placeholder="Expression that evaluates to a probability" />
@@ -67,19 +59,26 @@
 
 const INITPROB = .5
 
-$(document).ready(() => {
+const CLOG = console.log
+const ASSERT = console.assert
 
-$("#prob").html(INITPROB)
+function $(id) { return document.getElementById(id) } // to be jQuery-esque
+//function html(el) { return el ? el.innerHTML : null }
+
+// This is the plain JavaScript equivalent of $(document).ready
+document.addEventListener('DOMContentLoaded', function() {
+
+$('prob').innerHTML = INITPROB
 const slots = spinner.compute2Slots(INITPROB)
-const spinz = spinner.create($('#my-spinner'), slots)
+//const spinz = spinner.create($('my-spinner'), slots)
+const spinz = spinner.create(document.querySelector('#my-spinner'), slots)
 
-// Configure button event
-$('#expectorize').click(e => {
+$('expectorize').addEventListener('click', e => {
   e.preventDefault()
   document.getElementById("audiotag1").play()
   spinner.redraw(spinz)
   // Start the spinner and have it land on slice 0 with probability p
-  const p = Number($("#prob").html()) || 0  // default to 0 if it doesn't parse
+  const p = Number($('prob').innerHTML) || 0 // default to 0 if it doesn't parse
   const target = spinpick([0, 1], [p, 1-p])
   CLOG(`DEBUG: ` + 
     `p=${p} and it's gonna land on slot ${target} ie ${['YES', 'NO'][target]}`)
@@ -87,21 +86,21 @@ $('#expectorize').click(e => {
 })
 
 // Configure what happens when the input field changes (update the spinner)
-$('#expr').on("input propertychange", e => {
+$('expr').addEventListener('input', e => {
   try {
     const p = parsefrac(desugar(e.target.value))
     if (isNaN(p)) { 
       spinner.setNaN(spinz)
-      $("#prob").html('NaN') // maybe a '?' would be more normie-friendly?
+      $('prob').innerHTML = "NaN"  // maybe a '?' would be more normie-friendly?
     } else {
-      $("#prob").html(p) // the parsed probability in gray
+      $('prob').innerHTML = p      // the parsed probability in gray
       const slots = spinner.compute2Slots(p)
       spinner.update(spinz, slots)
     }
   } catch (error) {
     CLOG("Oh hi, I haven't found a way to ever reach this code. Did you?")
     spinner.setNaN(spinz)
-    $("#prob").html("NaN")
+    $('prob').innerHTML = "NaN"
   }
 })
 
