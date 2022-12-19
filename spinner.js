@@ -175,19 +175,17 @@ function spin_start(spin, winner) {
 	spin_anim(spin)
 }
 
+// Snap to the final destination (which should be close enough to where the 
+// animation is that there's no visible snapping) and draw a bolder outline 
+// around the winning pie slice.
 function spin_stop(spin) {
-  // Compute where it's supposed to be and snap it there; shouldn't be more than
-  // a degree or two off from the animation.
-  const rotationTot = 
-             computeTotalRotation(spin.duration, spin.startTime, spin.spinSpeed)
-  spin.degree = mod(rotationTot, 360)
+  spin.degree = mod(
+       computeTotalRotation(spin.duration, spin.startTime, spin.spinSpeed), 360)
   spin.obj.style.transform = `rotate(-${spin.degree}deg)`
-  // Figure out winning slot, draw new outline on it to show it's the winner
   const win = spin.slots[spin.winner]
   const p = win.weight
   let [a, b] = [win.startAngle, win.endAngle]
-  CLOG(`DEBUG: spin_stop: p=${p}, a=${a}, b=${b}`)
-  if (p > 1-1e-5) { a = 0; b = 360 - 1e-5 }
+  if (p > 1-1e-4) { a = 0; b = 360 - 1e-4 }
   spin.obj.innerHTML += `<path d="${arcPath(50,50, 5, 50, a, b)}" ` +
                            `fill="#00000000" stroke="white" stroke-width="2" />`
 }
@@ -212,9 +210,9 @@ const strokeblurb = 'stroke="#000000" stroke-width="1" opacity="0.3" '
 // Take start angle a, end angle b, the color, and the probability; return svg 
 // blurb for wedge
 function arcblurb(a, b, color, p) {
-  CLOG(`DEBUG: arcblurb: a=${a}, b=${b}, color=${color}, p=${p}`)
+  //CLOG(`DEBUG: arcblurb: a=${a}, b=${b}, color=${color}, p=${p}`)
   if (a === b && color === 'black') { a = 0; b = 360 - 1e-5 }
-  if (p > 1-1e-3) { a = 0; b = 360 - 1e-3 }
+  if (p > 1-1e-4) { a = 0; b = 360 - 1e-4 } // weirdness with middle dot...
   return `<path d="${arcPath(50,50, 5,50, a, b)}" fill="${color}" />`
   // We can just make an arc from 0 to almost-360 degrees so no need for this
   // special case:
@@ -235,32 +233,20 @@ function redrawSpinner(spin) {
   const textOffset = spin.slots.length <= 4 ? 35 : 45
 
   let svg = ''
-  const iAtOne = weights.findIndex(i => i == 1) // wedge that's the whole pie
-  if (iAtOne > -1 && false) {
-    const p = 1
-    const val = spin.slots[iAtOne].value
-    const tc = polarToCartesian(50, 50, textOffset, 0)
-    svg += arcblurb(0, 0, spin.slots[iAtOne].color, p) +
-      `<text x="${tc.x}" y="${tc.y}" fill="white" ` + 
-             fontblurb(p) + alignblurb + 
-            `transform="rotate(0, ${tc.x}, ${tc.y})">` + 
-      (val === "100%" ? "💯" : val) + `</text>`
-  } else {
-    for (let i = 0, ang = 0; i < spin.slots.length; i++) {
-      const p = weights[i]            // probability of this slot
-      if (p === 0) continue
-      const degDelta = 360*p          // number of degrees in this wedge
-      const midAngle = ang+degDelta/2 // draw the text in the middle of the arc
-      const tc = polarToCartesian(50, 50, textOffset, midAngle) // text coords
-      const rotateblurb = `transform="rotate(${midAngle}, ${tc.x}, ${tc.y})"`
-      spin.slots[i]["startAngle"] = ang
-      spin.slots[i]["endAngle"] = ang + degDelta
-      svg += arcblurb(ang, ang + degDelta, spin.slots[i].color, p) +
-             `<text x="${tc.x}" y="${tc.y}" fill="white" ` +
-                    fontblurb(p) + alignblurb + rotateblurb + '>' +
-                spin.slots[i].value + '</text>'
-      ang += degDelta
-    }
+  for (let i = 0, ang = 0; i < spin.slots.length; i++) {
+    const p = weights[i]            // probability of this slot
+    if (p === 0) continue
+    const degDelta = 360*p          // number of degrees in this wedge
+    const midAngle = ang+degDelta/2 // draw the text in the middle of the arc
+    const tc = polarToCartesian(50, 50, textOffset, midAngle) // text coords
+    const rotateblurb = `transform="rotate(${midAngle}, ${tc.x}, ${tc.y})"`
+    spin.slots[i]["startAngle"] = ang
+    spin.slots[i]["endAngle"] = ang + degDelta
+    svg += arcblurb(ang, ang + degDelta, spin.slots[i].color, p) +
+           `<text x="${tc.x}" y="${tc.y}" fill="white" ` +
+                  fontblurb(p) + alignblurb + rotateblurb + '>' +
+              spin.slots[i].value + '</text>'
+    ang += degDelta
   }
   spin.obj.innerHTML = svg
 }
@@ -298,8 +284,6 @@ function spinner(div, slots) {
   updateSpinner(spin, slots)
   return spin
 }
-
-function percentify(x) { return Math.round(100*x) + "%" }
 
 // computes two slots given a probability
 function compute2Slots(p) {

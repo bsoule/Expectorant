@@ -17,6 +17,8 @@ Finally, we have the parsefrac function for doing that evaluation and getting
 an actual number. */
 // -----------------------------------------------------------------------------
 
+function percentify(x) { return Math.round(100*x) + "%" }
+
 // Renormalize a list of weights to sum to 1
 function renorm(w) {
   const tot = w.reduce((a,b)=>a+b)
