@@ -32,7 +32,7 @@
 <div class="wrapper"> <!-- wrapper and content divs set margins/positioning -->
 <div class="content" role="main">
 
-<h1>Expectorant <span class='versiontag'>v2022.12.19a</span></h1>
+<h1>Expectorant <span class='versiontag'>v2022.12.19c</span></h1>
 
 <p>
 <input id="expr" type="text" size="38"
@@ -70,9 +70,11 @@ let yeses = 0       // for all the spins we've done since we last changed the
 let trials = 0      // probability.
 
 // Take a probability and a spin object, pick the winner and spin that puppy
-function expectorize(p, so) {
+function expectorize(so) {
   $('audiotag1').play()
-  spinner.redraw(so)
+  spindraw(so)
+  const p = so.slots[0].weight // probability for first slot ie YES
+  //CLOG("WARNING: Flipped the probs from [p,1-p] to [1-p,p] for testing!")
   const target = spinpick([0, 1], [p, 1-p]) // land on slot 0 with probability p
   if (p === lastp) {
     yeses += target === 0 ? 1 : 0
@@ -85,7 +87,7 @@ function expectorize(p, so) {
   CLOG(`🥁 Gonna land on slot ${target} ie ${['YES','NO'][target]} ` +
     `bringing us to ` + 
     `${yeses}/${trials} = ${percentify(yeses/trials)} yeses so far w/ p=${p}`)
-  spinner.start(so, target)
+  spingo(so, target)
 }
   
 // This is the plain JavaScript equivalent of jQuery's $(document).ready
@@ -93,41 +95,26 @@ document.addEventListener('DOMContentLoaded', () => {          // document-ready
 
 $('expr').focus()
 $('prob').innerHTML = INITPROB
-const slots = spinner.compute2Slots(INITPROB)
-const spinz = spinner.create(document.querySelector('#my-spinner'), slots)
+const slots = genslots(INITPROB)
+const spinzo = spinit(document.querySelector('#my-spinner'), slots)
 
 // Update the spinner & parse probability on every keystroke in the input field
 $('expr').addEventListener('input', e => {
   try {
     const p = parsefrac(desugar(e.target.value))
-    if (isNaN(p)) {
-      spinner.setNaN(spinz)
-      $('prob').innerHTML = 'NaN'  // maybe a '?' would be more normie-friendly?
-    } else if (!(p >= 0 && p <= 1)) {    // a number but not a valid probability
-      $('prob').innerHTML = p
-      spinner.setNaN(spinz)
-    } else {
-      $('prob').innerHTML = p      // the parsed probability in gray
-      spinner.update(spinz, spinner.compute2Slots(p))
-    }
+    $('prob').innerHTML = p
+    spinup(spinzo, genslots(p))
   } catch (error) {
     CLOG("Oh hi, I haven't found a way to ever reach this code. Did you?")
     CLOG(`DEBUG: ${JSON.stringify(error)}`)
-    spinner.setNaN(spinz)
-    $('prob').innerHTML = "NaN"
+    $('prob').innerHTML = "ERROR"
   }
 })
 
-$('expectorize').addEventListener('click', e => {
-  e.preventDefault()
-  const p = Number($('prob').innerHTML) || 0 // default to 0 if it doesn't parse
-  expectorize(p, spinz)
-})
+$('expectorize').addEventListener('click', e => { expectorize(spinzo) })
 
 $('expr').addEventListener("keyup", e => {
   if (e.key === "Enter") {
-    //e.preventDefault()        // cancel the default action, if needed?
-    //e.stopPropagation()
     $('expectorize').click()  // generate a click of the expectorize button
   }
 })
@@ -135,7 +122,6 @@ $('expr').addEventListener("keyup", e => {
 $('expr').addEventListener("keydown", e => {
   if (e.metaKey && e.key === "Enter") { $('expectorize').click() }
 })
-
 
 }) // end document-ready
 
