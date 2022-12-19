@@ -8,7 +8,7 @@
 
 <title>Expectorant</title>
 
-<!-- Meta tags for SEO and social sharing -->
+<!-- Meta tags for SEO and Open Graph link previews -->
 <link rel="canonical" href="https://expectorant.yootl.es/" />
 <meta name="description" 
   content="Random bill splitter and generalized dice roller. Fairness in expectation!" />
@@ -32,10 +32,10 @@
 <div class="wrapper"> <!-- wrapper and content divs set margins/positioning -->
 <div class="content" role="main">
 
-<h1>Expectorant <span class='versiontag'>v2022.12.18o</span></h1>
+<h1>Expectorant <span class='versiontag'>v2022.12.19a</span></h1>
 
 <p>
-<input id="expr" type="text" size="38" 
+<input id="expr" type="text" size="38"
   placeholder="Expression that evaluates to a probability" />
 &nbsp; <span id="probpre">p=</span><span id="prob">0%</span>
 <br/>
@@ -91,6 +91,7 @@ function expectorize(p, so) {
 // This is the plain JavaScript equivalent of jQuery's $(document).ready
 document.addEventListener('DOMContentLoaded', () => {          // document-ready
 
+$('expr').focus()
 $('prob').innerHTML = INITPROB
 const slots = spinner.compute2Slots(INITPROB)
 const spinz = spinner.create(document.querySelector('#my-spinner'), slots)
