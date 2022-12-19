@@ -21,10 +21,8 @@ function mod(x, m) { return (x % m + m) % m }
 // Convert Polar to Cartesian coordinates
 function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
   const angleInRadians = (angleInDegrees-90) * TAU / 360.0
-  return {
-    x: centerX + (radius * cos(angleInRadians)),
-    y: centerY + (radius * sin(angleInRadians)),
-  }
+  return { x: centerX + (radius * cos(angleInRadians)),
+           y: centerY + (radius * sin(angleInRadians)) }
 }
 
 // Draw a pie slice that is one section of the spinner
@@ -34,7 +32,8 @@ function arcPath(x, y, radius, endradius, startAngle, endAngle) {
   const start2 = polarToCartesian(x, y, endradius, endAngle)
   const end2   = polarToCartesian(x, y, endradius, startAngle)
   const largeArcFlag = endAngle - startAngle <= 180 ? "0" : "1"
-  return isNaN(start.x) ? '' : [
+  ASSERT(!isNaN(start.x), `start.x is NaN: ${start.x}`)
+  return [
     "M", start.x, start.y, 
     "A", radius, radius, 0, largeArcFlag, 0, end.x, end.y,
     "L", end2.x, end2.y,
@@ -93,6 +92,7 @@ function computeTotalRotation(duration, startTime, startSpeed) {
 function computeRotation(duration, startTime, startSpeed, currentTime) {
   const t = currentTime - startTime
   return -startSpeed/(2.5*duration)*(t-duration)**2 + startSpeed*duration/2.5
+
   const T = duration
   const B = startSpeed*T/2 // implies startSpeed = 2*B/T
   return (2*T*t - t**2) * B/T**2
@@ -121,18 +121,15 @@ function computeSpeed(duration, startTime, startSpeed, currentTime) {
 }
 
 // Execute the animation frame using css
-let spin_anim = function(spin) {
+function spin_anim(spin) {
   if (spin.speed < 0.01) { setTimeout(spin_stop(spin), 0); return true }
   const t = Date.now()
   spin.speed = computeSpeed(spin.duration, spin.startTime, spin.spinSpeed, t)
   // the spin is being eased, but what we want is the current location
   spin.degree = computeRotation(spin.duration, spin.startTime,spin.spinSpeed,t)
 	spin.degree = mod(spin.degree, 360)
-	//spin.obj.css('transform', `rotate(-${spin.degree}deg)`)
   spin.obj.style.transform = `rotate(-${spin.degree}deg)`
-  // curry this.
-  const sa = () => { spin_anim(spin) }
-	requestAnimFrame(sa)
+	requestAnimFrame(() => spin_anim(spin)) // curried version of spin_anim? why?
 }
 
 // Take a spin object and the index of the slot destined to win, start spinning
@@ -141,7 +138,6 @@ function spin_start(spin, winner) {
     `Can't take slot ${winner} of ${JSON.stringify(spin.slots)}`)
   spin.degree = 0
   spin.winner = winner
-  //spin.obj.css('transform', `rotate(-${spin.degree}deg)`)
   spin.obj.style.transform = `rotate(-${spin.degree}deg)`
   spin.startTime = Date.now()
 	spin.rand_speed = Math.random()
@@ -165,7 +161,7 @@ function spin_start(spin, winner) {
     // not inside the winner, so determine how much more we need by finding
     // a random value between start and end
     const ranAngle = 
-      Math.random() * (win.endAngle - win.startAngle) + win.startAngle
+                Math.random() * (win.endAngle - win.startAngle) + win.startAngle
     // decide how much to add to oneRot to get to ranAgnle, then do that to
     // rotationTot instead
     const newTot = rotationTot + (ranAngle - oneRot)
@@ -180,27 +176,22 @@ function spin_start(spin, winner) {
 }
 
 function spin_stop(spin) {
-  // Compute where it is supposed to be and snap it there; shouldn't be more
-  // than a degree or two off from the animation.
+  // Compute where it's supposed to be and snap it there; shouldn't be more than
+  // a degree or two off from the animation.
   const rotationTot = 
-    computeTotalRotation(spin.duration, spin.startTime, spin.spinSpeed)
+             computeTotalRotation(spin.duration, spin.startTime, spin.spinSpeed)
   spin.degree = mod(rotationTot, 360)
-  //spin.obj.css('transform', `rotate(-${spin.degree}deg)`)
   spin.obj.style.transform = `rotate(-${spin.degree}deg)`
-  // Figure out the winning slot, draw new outline pie over it to show that it's
-  // the winner!
-
-  // TODO: handle the case where the prob is 1 (we have to draw a circle 
-  // instead of an arc?)
-  // const weights = renorm(spin.slots.map(i => i.weight))
-  // const startAngle = 0
+  // Figure out winning slot, draw new outline on it to show it's the winner
   const win = spin.slots[spin.winner]
-  const svg = spin.obj.innerHTML + 
-    `<path d="${arcPath(50,50, 5, 50, win.startAngle, win.endAngle)}" ` +
-          `fill="#00000000" ` +
-          `stroke="#ffffff" ` +
-          `stroke-width="2" />`
-  spin.obj.innerHTML = svg
+  const p = win.weight
+  let [a, b] = [win.startAngle, win.endAngle]
+  CLOG(`DEBUG: spin_stop: p=${p}, a=${a}, b=${b}`)
+  if (p > 1-1e-5) { a = 0; b = 360 - 1e-5 }
+  spin.obj.innerHTML += `<path d="${arcPath(50,50, 5, 50, a, b)}" ` +
+                              `fill="#00000000" ` +
+                              `stroke="white" ` +
+                              `stroke-width="2" />`
 }
 
 function setSpinnerNaN(spin) {
@@ -213,7 +204,7 @@ function setSpinnerNaN(spin) {
 // Take the weight (probability) of the pie slice and make the font blurb
 function fontblurb(x) {
   const MAXF = 16            // biggest font size that looks good on the spinner
-  const fs = min(MAXF, x*100 - 1)    // 10% probability displayed at font size 9
+  const fs = min(MAXF, max(0, x*100 - 1))  // eg, p=10% displayed at font size 9
   return `font-family="Arial" font-style="bold" font-size="${fs}" `
 }
 
@@ -221,18 +212,17 @@ const alignblurb = 'alignment-baseline="central" text-anchor="middle" '
 const strokeblurb = 'stroke="#000000" stroke-width="1" opacity="0.3" '
 
 // Take start angle a and end angle b and the color, return blurb for wedge
-function arcblurb(a, b, color) {
-  return abs(a-b) < 1e-1 ? // have to draw a circle not an arc in this case
-    `<circle cx="50" cy="50" r="50" fill="${color}"/>` +
-    `<circle cx="50" cy="50" r="5"  fill="white"/>`
-  : `<path d="${arcPath(50,50, 5,50, a, b)}" fill="${color}" ` +
-          `stroke="#ffffff" stroke-width="0" />`
+function arcblurb(a, b, color, p) { // TODO: also passing in probability p
+  CLOG(`DEBUG: arcblurb: a=${a}, b=${b}, color=${color}, p=${p}`)
+  if (a === b && color === 'black') { a = 0; b = 360 - 1e-5 }
+  if (p > 1-1e-5) { a = 0; b = 360 - 1e-5 }
+  return `<path d="${arcPath(50,50, 5,50, a, b)}" fill="${color}" />`
+  // `<circle cx="50" cy="50" r="50" fill="${color}"/>` +
+  // `<circle cx="50" cy="50" r="5"  fill="white"/>`
 }
 
 // Take angle in degrees and x,y coordinates, return svg blurb for the rotation
-function rotateblurb(d, x, y) {
-  return `transform="rotate(${d}, ${x}, ${y})"`
-}
+function rotateblurb(d, x, y) { return `transform="rotate(${d}, ${x}, ${y})"` }
 
 function redrawSpinner(spin) {
   const totweight = spin.slots.reduce((a, b) => a + b.weight, 0)
@@ -245,34 +235,29 @@ function redrawSpinner(spin) {
 
   let svg = ''
   const iAtOne = weights.findIndex(i => i == 1) // wedge that's the whole pie
-  if (iAtOne > -1 || false) {
-    // We have to draw a circle instead of an arc in this case.
+  if (iAtOne > -1 && false) {
+    const p = 1
+    const val = spin.slots[iAtOne].value
     const tc = polarToCartesian(50, 50, textOffset, 0)
-    svg += arcblurb(0, 0, spin.slots[iAtOne].color) +
-      //`<circle cx="50" cy="50" r="50" fill="${spin.slots[iAtOne].color}"/>` +
-      //`<circle cx="50" cy="50" r="5"  fill="white"/>` +
-      `<text x="${tc.x}" y="${tc.y}" fill="#ffffff" ` + 
-             fontblurb(1) + alignblurb + 
-            `transform="rotate(0, ${tc.x}, ${tc.y})">` +
-        spin.slots[iAtOne].value + '</text>'
+    svg += arcblurb(0, 0, spin.slots[iAtOne].color, p) +
+      `<text x="${tc.x}" y="${tc.y}" fill="white" ` + 
+             fontblurb(p) + alignblurb + 
+            `transform="rotate(0, ${tc.x}, ${tc.y})">` + 
+      (val === "100%" ? "💯" : val) + `</text>`
   } else {
     for (let i = 0, ang = 0; i < spin.slots.length; i++) {
-      const degDelta = 360*weights[i] // number of degrees in this wedge
+      const p = weights[i]            // probability of this slot
+      if (p === 0) continue
+      const degDelta = 360*p          // number of degrees in this wedge
       const midAngle = ang+degDelta/2 // draw the text in the middle of the arc
       const tc = polarToCartesian(50, 50, textOffset, midAngle) // text coords
       const rotateblurb = `transform="rotate(${midAngle}, ${tc.x}, ${tc.y})"`
       spin.slots[i]["startAngle"] = ang
       spin.slots[i]["endAngle"] = ang + degDelta
-      svg += arcblurb(ang, ang + degDelta, spin.slots[i].color) +
-             //`<path d="${arcPath(50,50, 5,50, ang, ang + degDelta)}"` + 
-             //      `fill="${spin.slots[i].color}" ` +
-             //      `stroke="#ffffff" ` + `stroke-width="0" />` +
-             `<text x="${tc.x}" y="${tc.y}" fill="#ffffff" ` +
-                    fontblurb(weights[i]) + alignblurb + rotateblurb + '>' +
+      svg += arcblurb(ang, ang + degDelta, spin.slots[i].color, p) +
+             `<text x="${tc.x}" y="${tc.y}" fill="white" ` +
+                    fontblurb(p) + alignblurb + rotateblurb + '>' +
                 spin.slots[i].value + '</text>'
-      if (weights[i] > .99) {
-        CLOG(`DEBUG: i=${i} p=${weights[i]} ang=${ang} + ${degDelta}\n${svg}`)
-      }
       ang += degDelta
     }
   }
@@ -285,32 +270,11 @@ function updateSpinner(spin, slots) {
   redrawSpinner(spin)
 }
 
-/* de-jQuerying:
-
-function foo(div) {
-  div.append('<svg xmlns="http://www.w3.org/2000/svg" class="spin" width="100%" height="100%" viewbox="0 0 100 100"></svg>')
-  return div.children('svg')
-}
-
-foo($('my-spinner'))
-
-->
-
-function foo(div) {
-  div.innerHTML += '<svg xmlns="http://www.w3.org/2000/svg" class="spin" width="100%" height="100%" viewbox="0 0 100 100"></svg>';
-  return div.querySelectorAll('svg');
-}
-
-const mySpinner = document.querySelector('#my-spinner');
-foo(mySpinner);
-
-*/
-
+// Create an svg directly in the div and initialize the spinner object
 function spinner(div, slots) {
-  // create an svg directly in the div 
-  div.innerHTML += '<svg xmlns="http://www.w3.org/2000/svg" class="spin" width="100%" height="100%" viewbox="0 0 100 100"></svg>'
+  div.innerHTML += '<svg xmlns="http://www.w3.org/2000/svg" ' +
+          'class="spin" width="100%" height="100%" viewbox="0 0 100 100"></svg>'
 
-  // generate the spin object
   const spin = {
     slots: slots,
     obj: div.querySelector('svg'),
@@ -341,8 +305,8 @@ function compute2Slots(p) {
   if (p < 0 || p > 1) throw `Probability (${p}) must be between 0 and 1`
   return [
     // Or we could label the slices with 'YES/💰/⬆️' and 'NO/🆓/⬇️'
-    { value: percentify(p),   color: 'green', weight: p   },
-    { value: percentify(1-p), color: 'red',   weight: 1-p },
+    { value: percentify(p),   weight: p,   color: 'green' },
+    { value: percentify(1-p), weight: 1-p, color: 'red'   },
   ]
 }
 
