@@ -338,7 +338,7 @@ function percentify(x) { return Math.round(100*x) + "%" }
 
 // computes two slots given a probability
 function compute2Slots(p) {
-  if (p < 0 || p > 1) throw "Probability must be between 0 and 1"
+  if (p < 0 || p > 1) throw `Probability (${p}) must be between 0 and 1`
   return [
     // Or we could label the slices with 'YES/💰/⬆️' and 'NO/🆓/⬇️'
     { value: percentify(p),   color: 'green', weight: p   },

@@ -33,7 +33,7 @@
 <div class="wrapper">
 <div class="content" role="main">
 
-<h1>Expectorant <span class='versiontag'>v2022.12.18b</span></h1>
+<h1>Expectorant <span class='versiontag'>v2022.12.18d</span></h1>
 
 <p>
 <input id="expr" type="text" size="38" placeholder="Expression that evaluates to a probability" />
@@ -60,16 +60,15 @@
 
 <script>
 
-const INITPROB = .5
+const INITPROB = .5 // the probability the spinner is preloaded with
 
 const CLOG = console.log
 const ASSERT = console.assert
 
 function $(id) { return document.getElementById(id) } // to be jQuery-esque
-//function html(el) { return el ? el.innerHTML : null }
 
-// This is the plain JavaScript equivalent of $(document).ready
-document.addEventListener('DOMContentLoaded', function() {
+// This is the plain JavaScript equivalent of jQuery's $(document).ready
+document.addEventListener('DOMContentLoaded', () => {          // document-ready
 
 $('prob').innerHTML = INITPROB
 const slots = spinner.compute2Slots(INITPROB)
@@ -92,16 +91,19 @@ $('expectorize').addEventListener('click', e => {
 $('expr').addEventListener('input', e => {
   try {
     const p = parsefrac(desugar(e.target.value))
-    if (isNaN(p)) { 
+    if (isNaN(p)) {
       spinner.setNaN(spinz)
-      $('prob').innerHTML = "NaN"  // maybe a '?' would be more normie-friendly?
+      $('prob').innerHTML = 'NaN'  // maybe a '?' would be more normie-friendly?
+    } else if (!(p >= 0 && p <= 1)) {    // a number but not a valid probability
+      $('prob').innerHTML = p
+      spinner.setNaN(spinz)
     } else {
       $('prob').innerHTML = p      // the parsed probability in gray
-      const slots = spinner.compute2Slots(p)
-      spinner.update(spinz, slots)
+      spinner.update(spinz, spinner.compute2Slots(p))
     }
   } catch (error) {
     CLOG("Oh hi, I haven't found a way to ever reach this code. Did you?")
+    CLOG(`DEBUG: ${JSON.stringify(error)}`)
     spinner.setNaN(spinz)
     $('prob').innerHTML = "NaN"
   }
