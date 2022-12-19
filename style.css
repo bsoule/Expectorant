@@ -28,6 +28,11 @@ h1 {
   color: #2800FF;
 }
 
+.versiontag {
+  color:gray; 
+  font-size: 9px;
+}
+
 input { 
   height: 24px;
   padding: 8px;
