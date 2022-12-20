@@ -52,31 +52,10 @@ function arcPath(x, y, radius, endradius, startAngle, endAngle) {
 
 // Total degrees the spinner spins by time t if it does D by time T
 // (See the end of this file for the math of this)
-function dist(t, T, D) 
-{ return 2*D/T * t - D/T**2 * t**2 } // constant accel.
-//{ return D/T * t } // constant velocity
-
-// Stop a tiny bit before the real target so it snaps into place?
-function totalRotation(duration, tini, startSpeed) {
-  const tcur = tini + duration - 0.01
-  return rotationFromTime(duration, tini, startSpeed, tcur)
-}
-
-// Compute rotation as a function of current time
-function rotationFromTime(duration, tini, startSpeed, tcur) {
-  tcur -= tini
-  return -startSpeed/(2.5*duration)*(tcur-duration)**2 + startSpeed*duration/2.5
-}
-
-// I'm confused; time as a function of distance should be messier than this...
-function timeFromRotation(duration, startSpeed, rotation) {
-  return 2.5*rotation / startSpeed
-}
-
-// Derivative of the distance function
-function speedFromTime(duration, tini, startSpeed, tcur) {
-  tcur -= tini
-  return 0.8 * startSpeed * (duration - tcur) / duration
+function dist(t, T, D) {
+  //return D/T * t // constant velocity (simplest but doesn't look good)
+  //return 2*D/T * t - D/T**2 * t**2  // constant acceleration (like gravity!)
+  return D*(1 - 0.0002**(t/T)) // exponential decay, never quiiiiite stops
 }
 
 // Execute the animation frame using css
@@ -86,15 +65,6 @@ function spin_anim(so) {
   so.dcur = dist(t-so.tini, so.tdel, so.dtot)
   so.obj.style.transform = `rotate(-${mod(so.dcur, 360)}deg)`
 	requestAnimFrame(() => spin_anim(so)) // curried version of spin_anim? why?
-  /*
-  if (so.speed < 0.01) { setTimeout(spinstop(so), 0); return true }
-  const t = Date.now()
-  so.speed = speedFromTime(so.duration, so.tini, so.spinSpeed, t)
-  // The spin is being eased, but what we want is the current location
-  so.degree = rotationFromTime(so.duration, so.tini, so.spinSpeed, t)
-  so.obj.style.transform = `rotate(-${mod(so.degree, 360)}deg)`
-	requestAnimFrame(() => spin_anim(so)) // curried version of spin_anim? why?
-  */
 }
 
 // Snap to the final destination (which should be close enough to where the 
@@ -108,16 +78,6 @@ function spinstop(so) {
   if (p > 1-1e-4) { a = 0; b = 360 - 1e-4 }
   so.obj.innerHTML += `<path d="${arcPath(50,50, 5, 50, a, b)}" ` +
                            `fill="#00000000" stroke="white" stroke-width="2" />`
-  /*
-  so.degree = totalRotation(so.duration, so.tini, so.spinSpeed)
-  so.obj.style.transform = `rotate(-${mod(so.degree, 360)}deg)`
-  const win = so.slots[so.windex]
-  const p = win.weight
-  let [a, b] = [(win.kyoom - p) * 360, win.kyoom * 360]  // start & end angles
-  if (p > 1-1e-4) { a = 0; b = 360 - 1e-4 }
-  so.obj.innerHTML += `<path d="${arcPath(50,50, 5, 50, a, b)}" ` +
-                           `fill="#00000000" stroke="white" stroke-width="2" />`
-  */
 }
 
 // Set the winner and start spinning the given spinner object
@@ -131,37 +91,7 @@ function spingo(so, windex) {
   let [a, b] = [(win.kyoom - p) * 360, win.kyoom * 360]    // start & end angles
   const rangle = Math.random() * (b - a) + a  // random angle pointing to winner
   so.dtot = rangle + 5*360 // a bunch of extra rotations; adjust to taste
-  //CLOG(`DEBUG: ${JSON.stringify(so)}`)
   spin_anim(so)
-  /*
-  so.degree = 0
-  so.obj.style.transform = `rotate(-${so.degree}deg)`
-  so.tini = Date.now()
-	so.rand_speed = Math.random()
-  so.speed = so.spinSpeed
-  so.duration = so.min_duration + 
-                             (so.max_duration - so.min_duration) * so.rand_speed
-  // Compute the total rotation, and figure out if it is landing on the winner.
-  // If not, adjust the duration so that we do land on the winner by 
-  // determining a position and then computing the time at that position and
-  // updating the duration to match. This is not elegant.
-  const win = so.slots[windex]
-  const rotTot = totalRotation(so.duration, so.tini, so.spinSpeed)
-  const oneRot = mod(rotTot, 360)
-  // Figure out if we're already on the winner, or if we need to adjust
-  const p = win.weight
-  let [a, b] = [(win.kyoom - p) * 360, win.kyoom * 360]  // start & end angles
-  if (oneRot < a || oneRot > b) {
-    // Not inside the winner, so determine how much more we need by finding
-    // a random value between start and end
-    const rangle = Math.random() * (b - a) + a
-    // Decide how much to add to oneRot to get to rangle, then do that to
-    // rotTot instead, computing a duration that gets us to the new total.
-    so.duration = timeFromRotation(so.duration, so.spinSpeed, 
-                                                    rotTot + (rangle - oneRot))
-  }
-	spin_anim(so)
-  */
 }
 
 // Take the weight (probability) of the pie slice and make the font blurb
@@ -177,11 +107,11 @@ function arcblurb(slot) {
   const p = slot.weight                        // probability ie fraction of pie
   let [a, b] = [(slot.kyoom - p) * 360, slot.kyoom * 360]  // start & end angles
   // Things break if we try to draw an arc from exactly 0 to 360 degrees, those
-  // being the same thing, so adjust to 0 to 359.999 in that case.
+  // being the same thing, so adjust to like 0 to 359.999 in that case.
   // But also for some buggy reason, things like .00001 degrees to 360 degrees
   // also break (?) so we're just drawing basically the whole circle if a pie
   // slice is close enough to p=1.
-  if (p > 1-1e-4) { a = 0; b = 360 - 1e-4 }
+  if (p > 1-1e-4) { a = 0; b = 360 - 1e-4 } // breaks a bit if that 1e-4 is 1e-5
   return `<path d="${arcPath(50,50, 5,50, a, b)}" fill="${slot.color}" />`
   // PS: we can just make a 0-359.9 degree arc so no need for this special case:
   // `<circle cx="50" cy="50" r="50" fill="${color}"/>` +
@@ -215,17 +145,9 @@ function spinit(div, slots) { return {
   slots:  slots,                  // list of slots (see genslots)
   windex: -1,                     // index of the winning slot
   tini:   -1,                     // initial timestamp, when spinning starts
-  tdel:   4450,                   // total duration of the spin, in milliseconds
+  tdel:   4400+500,               // spin duration (ms); adjust to taste
   dtot:   -1,                     // total distance in degrees it's gonna spin
   dcur:   0,                      // current distance in degrees it has spun
-  // ------------------------ we should be able to get rid of everything below
-  speed: 0,
-  spinSpeed: 1,
-  degree: 0,
-  min_duration: 3000,
-  max_duration: 5000,
-  rand_speed: 0,
-  duration: 0,
 }}
 
 // Generate a list of slots from a probability (just need one probability for
