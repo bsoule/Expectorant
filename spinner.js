@@ -1,7 +1,7 @@
 /* Here we provide the following functions for spinning a spinner:
 1. genslots: generate the list of slots aka pie slices
-2. spinit: initialize spinner with a div and list of slots, return spin object
-3. spingo: make it start spinning, destined to land on given slot
+2. spinit: initialize spinner with a div and list of slots, return a spin object
+3. spingo: make the spinner respresented by the given spin object start spinning
 4. spindraw: draw or redraw the spinner for the given spin object
 */
 
@@ -90,6 +90,14 @@ function speedFromTime(duration, tini, startSpeed, tcur) {
 }
 */
 
+// How far the spinner (spin object so) has spun in total degrees as of now
+function dist(so) {
+  const t = Date.now() - so.tini  // milliseconds since spinner started spinning
+  const T = so.tdel               // total time the spinner is gonna spin
+  const D = so.dtot               // total distance the spinner is gonna spin
+  return (2*T*t - t**2) * D/T**2
+}
+
 // Stop a tiny bit before the real target so it snaps into place?
 function totalRotation(duration, tini, startSpeed) {
   const tcur = tini + duration - 0.01
@@ -98,34 +106,19 @@ function totalRotation(duration, tini, startSpeed) {
 
 // Compute rotation as a function of current time
 function rotationFromTime(duration, tini, startSpeed, tcur) {
-  const t = tcur - tini
-  return -startSpeed/(2.5*duration)*(t-duration)**2 + startSpeed*duration/2.5
-
-  const T = duration
-  const B = startSpeed*T/2 // implies startSpeed = 2*B/T
-  return (2*T*t - t**2) * B/T**2
-  // ORIG: -startSpeed/(2.5*duration)*(t-duration)**2 + startSpeed*duration/2.5
+  tcur -= tini
+  return -startSpeed/(2.5*duration)*(tcur-duration)**2 + startSpeed*duration/2.5
 }
 
 // I'm confused; time as a function of distance should be messier than this...
 function timeFromRotation(duration, startSpeed, rotation) {
   return 2.5*rotation / startSpeed
-
-  const T = duration
-  const B = startSpeed*T/2
-  return T + T/B*Math.sqrt(B*(B-rotation))
-  // ORIG: 2.5*rotation / startSpeed
 }
 
 // Derivative of the distance function
 function speedFromTime(duration, tini, startSpeed, tcur) {
-  const t = tcur - tini
-  return 0.8 * startSpeed * (duration - t) / duration
-  
-  const T = duration
-  const B = startSpeed*T/2
-  return 2*B*(T-t)/T**2
-  // ORIG: 0.8 * startSpeed * (duration - t) / duration
+  tcur -= tini
+  return 0.8 * startSpeed * (duration - tcur) / duration
 }
 
 // Execute the animation frame using css
@@ -139,12 +132,36 @@ function spin_anim(so) {
 	requestAnimFrame(() => spin_anim(so)) // curried version of spin_anim? why?
 }
 
-// Take a spin object and the index of the slot destined to win, start spinning
+// Snap to the final destination (which should be close enough to where the 
+// animation is that there's no visible snapping) and draw a bolder outline 
+// around the winning pie slice.
+function spinstop(so) {
+  so.degree = totalRotation(so.duration, so.tini, so.spinSpeed)
+  so.obj.style.transform = `rotate(-${mod(so.degree, 360)}deg)`
+  const win = so.slots[so.windex]
+  const p = win.weight
+  let [a, b] = [(win.kyoom - p) * 360, win.kyoom * 360]  // start & end angles
+  if (p > 1-1e-4) { a = 0; b = 360 - 1e-4 }
+  so.obj.innerHTML += `<path d="${arcPath(50,50, 5, 50, a, b)}" ` +
+                           `fill="#00000000" stroke="white" stroke-width="2" />`
+}
+
+// Set the winner and start spinning the given spinner object
 function spingo(so, windex) {
   ASSERT(windex >= 0 && windex < so.slots.length, 
     `Can't take slot ${windex} of ${JSON.stringify(so.slots)}`)
-  so.degree = 0
   so.windex = windex
+  
+  // compute dtot
+/*
+  let [a, b] = [(win.kyoom - p) * 360, win.kyoom * 360]    // start & end angles
+  const rangle = Math.random() * (b - a) + a  // random angle pointing to winner
+  so.dtot = rangle + 0*360 // probably a few more extra spins than this?
+  spin_anim(so)
+  return
+*/
+
+  so.degree = 0
   so.obj.style.transform = `rotate(-${so.degree}deg)`
   so.tini = Date.now()
 	so.rand_speed = Math.random()
@@ -171,20 +188,6 @@ function spingo(so, windex) {
                                                     rotTot + (rangle - oneRot))
   }
 	spin_anim(so)
-}
-
-// Snap to the final destination (which should be close enough to where the 
-// animation is that there's no visible snapping) and draw a bolder outline 
-// around the winning pie slice.
-function spinstop(so) {
-  so.degree = totalRotation(so.duration, so.tini, so.spinSpeed)
-  so.obj.style.transform = `rotate(-${mod(so.degree, 360)}deg)`
-  const win = so.slots[so.windex]
-  const p = win.weight
-  let [a, b] = [(win.kyoom - p) * 360, win.kyoom * 360]  // start & end angles
-  if (p > 1-1e-4) { a = 0; b = 360 - 1e-4 }
-  so.obj.innerHTML += `<path d="${arcPath(50,50, 5, 50, a, b)}" ` +
-                           `fill="#00000000" stroke="white" stroke-width="2" />`
 }
 
 // Take the weight (probability) of the pie slice and make the font blurb
@@ -232,29 +235,24 @@ function spindraw(so) {
   so.obj.innerHTML = svg
 }
 
-// Create an svg directly in the div, initialize and return the spinner object
-function spinit(div, slots) {
-  div.innerHTML += '<svg xmlns="http://www.w3.org/2000/svg" ' +
-          'class="spin" width="100%" height="100%" viewbox="0 0 100 100"></svg>'
-  const so = {
-    obj:    div.querySelector('svg'),
-    slots:  slots,                // list of slots (see genslots)
-    windex: -1,                   // index of the winning slot
-    tini:   Date.now(),           // initial timestamp, when spinning starts
-  //tdel:   4500,                 // total duration of the spin, in milliseconds
-  //vcur:   0,                    // current position in degrees
-    // ------------------------ we should be able to get rid of everything below
-    speed: 0,
-    spinSpeed: 1,
-    degree: 0,
-    min_duration: 3000,
-    max_duration: 5000,
-    rand_speed: 0,
-    duration: 0,
-  }
-  spindraw(so)
-  return so
-}
+// Initialize and return a fresh spinner object
+function spinit(div, slots) { return {
+  obj:    div.querySelector('svg'),
+  slots:  slots,                  // list of slots (see genslots)
+  windex: -1,                     // index of the winning slot
+  tini:   Date.now(),             // initial timestamp, when spinning starts
+  tdel:   4500,                   // total duration of the spin, in milliseconds
+  dtot:   -1,                     // total distance in degrees it's gonna spin
+  dcur:   0,                      // current distance in degrees it has spun
+  // ------------------------ we should be able to get rid of everything below
+  speed: 0,
+  spinSpeed: 1,
+  degree: 0,
+  min_duration: 3000,
+  max_duration: 5000,
+  rand_speed: 0,
+  duration: 0,
+}}
 
 // Generate a list of slots from a probability (just need one probability for
 // two slots) or a list of probabilities that sum to one.

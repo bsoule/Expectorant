@@ -32,10 +32,10 @@
 <div class="wrapper"> <!-- wrapper and content divs set margins/positioning -->
 <div class="content" role="main">
 
-<h1>Expectorant <span class='versiontag'>v2022.12.19f</span></h1>
+<h1>Expectorant <span class='versiontag'>v2022.12.19h</span></h1>
 
 <p>
-<input id="expr" type="text" size="100"
+<input id="expr" type="text" size="80"
        placeholder="Expression that evaluates to a probability" />
 <br/><span id="probpre">p=</span><span id="prob">0%</span>
 <br/>
@@ -53,8 +53,11 @@
 </div> <!-- end main -->
 </div> <!-- end wrapper -->
 
-<div class="spin_container">
-  <div id="my-spinner" class="spin_wrapper"></div>
+<div class="spin_container"> <!-- initially contains placeholder for spinner -->
+  <div id="spinneroo" class="spin_wrapper">
+    <svg xmlns="http://www.w3.org/2000/svg"
+         class="spin" width="100%" height="100%" viewbox="0 0 100 100"></svg>
+  </div>
 </div>
 
 <script>
@@ -75,34 +78,34 @@ function expectorize(so) {
   spindraw(so)
   const p = so.slots[0].weight // probability for first slot ie YES
   //CLOG("WARNING: Flipped the probs from [p,1-p] to [1-p,p] for testing!")
-  const target = spinpick([0, 1], [p, 1-p]) // land on slot 0 with probability p
+  const windex = spinpick([0, 1], [p, 1-p]) // land on slot 0 with probability p
   if (p === lastp) {
-    yeses += target === 0 ? 1 : 0
+    yeses += windex === 0 ? 1 : 0
     trials += 1
   } else { 
     lastp = p
-    yeses = target === 0 ? 1 : 0
+    yeses = windex === 0 ? 1 : 0
     trials = 1 
   }
-  CLOG(`🥁 Gonna land on slot ${target} ie ${['YES','NO'][target]} ` +
+  CLOG(`🥁 Gonna land on slot ${windex} ie ${['YES','NO'][windex]} ` +
     `bringing us to ` + 
     `${yeses}/${trials} = ${percentify(yeses/trials)} yeses so far w/ p=${p}`)
-  spingo(so, target)
+  spingo(so, windex)
 }
   
-// This is the plain JavaScript equivalent of jQuery's $(document).ready
 document.addEventListener('DOMContentLoaded', () => {          // document-ready
 
 $('expr').focus()
 $('prob').innerHTML = INITPROB
-const slots = genslots(INITPROB)
-const spinzo = spinit(document.querySelector('#my-spinner'), slots)
-
-// Update the spinner & parse probability on every keystroke in the input field
+const spinzo = spinit(document.querySelector('#spinneroo'), genslots(INITPROB))
+spindraw(spinzo)
+  
+// Update the slots and redraw the spinner on every keystroke in the input field
 $('expr').addEventListener('input', e => {
   try {
     const p = parsefrac(desugar(e.target.value))
     $('prob').innerHTML = p
+    // spinup(spinzo, genslots(p))
     spinzo.slots = genslots(p)
     spindraw(spinzo)
   } catch (error) {
@@ -115,16 +118,13 @@ $('expr').addEventListener('input', e => {
 $('expectorize').addEventListener('click', e => { expectorize(spinzo) })
 
 $('expr').addEventListener("keyup", e => {
-  if (e.key === "Enter") {
-    $('expectorize').click()
-  }
+  if (e.key === "Enter") { expectorize(spinzo) }
 })
-
 $('expr').addEventListener("keydown", e => {
-  if (e.metaKey && e.key === "Enter") { $('expectorize').click() }
+  if (e.metaKey && e.key === "Enter") { expectorize(spinzo) }
 })
 
-}) // end document-ready
+})                                                         // end document-ready
 
 </script>
 
