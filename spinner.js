@@ -2,8 +2,7 @@
 1. genslots: generate the list of slots aka pie slices
 2. spinit: initialize spinner with a div and list of slots, return spin object
 3. spingo: make it start spinning, destined to land on given slot
-4. spinup: update the spinner with new slots (and redraw it)
-5. spindraw: redraw the spinner
+4. spindraw: draw or redraw the spinner for the given spin object
 */
 
 // -----------------------------------------------------------------------------
@@ -28,7 +27,6 @@ function mod(x, m) { return (x % m + m) % m }
 
 // Convert Polar to Cartesian coordinates
 function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
-  angleInDegrees = mod(angleInDegrees, 360)
   const angleInRadians = (angleInDegrees-90)/360*TAU
   return { x: centerX + (radius * cos(angleInRadians)),
            y: centerY + (radius * sin(angleInRadians)) }
@@ -131,63 +129,61 @@ function speedFromTime(duration, tini, startSpeed, tcur) {
 }
 
 // Execute the animation frame using css
-function spin_anim(spin) {
-  if (spin.speed < 0.01) { setTimeout(spinstop(spin), 0); return true }
+function spin_anim(so) {
+  if (so.speed < 0.01) { setTimeout(spinstop(so), 0); return true }
   const t = Date.now()
-  spin.speed = speedFromTime(spin.duration, spin.tini, spin.spinSpeed, t)
+  so.speed = speedFromTime(so.duration, so.tini, so.spinSpeed, t)
   // The spin is being eased, but what we want is the current location
-  spin.degree = rotationFromTime(spin.duration, spin.tini, spin.spinSpeed, t)
-  spin.obj.style.transform = `rotate(-${mod(spin.degree, 360)}deg)`
-	requestAnimFrame(() => spin_anim(spin)) // curried version of spin_anim? why?
+  so.degree = rotationFromTime(so.duration, so.tini, so.spinSpeed, t)
+  so.obj.style.transform = `rotate(-${mod(so.degree, 360)}deg)`
+	requestAnimFrame(() => spin_anim(so)) // curried version of spin_anim? why?
 }
 
 // Take a spin object and the index of the slot destined to win, start spinning
-function spingo(spin, windex) {
-  ASSERT(windex >= 0 && windex < spin.slots.length, 
-    `Can't take slot ${windex} of ${JSON.stringify(spin.slots)}`)
-  spin.degree = 0
-  spin.windex = windex
-  spin.obj.style.transform = `rotate(-${spin.degree}deg)`
-  spin.tini = Date.now()
-	spin.rand_speed = Math.random()
-  spin.speed = spin.spinSpeed
-  spin.duration = spin.min_duration + 
-                       (spin.max_duration - spin.min_duration) * spin.rand_speed
-
+function spingo(so, windex) {
+  ASSERT(windex >= 0 && windex < so.slots.length, 
+    `Can't take slot ${windex} of ${JSON.stringify(so.slots)}`)
+  so.degree = 0
+  so.windex = windex
+  so.obj.style.transform = `rotate(-${so.degree}deg)`
+  so.tini = Date.now()
+	so.rand_speed = Math.random()
+  so.speed = so.spinSpeed
+  so.duration = so.min_duration + 
+                             (so.max_duration - so.min_duration) * so.rand_speed
   // Compute the total rotation, and figure out if it is landing on the winner.
   // If not, adjust the duration so that we do land on the winner by 
   // determining a position and then computing the time at that position and
   // updating the duration to match. This is not elegant.
-
-  const win = spin.slots[windex]
-  const rotationTot = totalRotation(spin.duration, spin.tini, spin.spinSpeed)
-  const oneRot = mod(rotationTot, 360)
+  const win = so.slots[windex]
+  const rotTot = totalRotation(so.duration, so.tini, so.spinSpeed)
+  const oneRot = mod(rotTot, 360)
   // Figure out if we're already on the winner, or if we need to adjust
   const p = win.weight
   let [a, b] = [(win.kyoom - p) * 360, win.kyoom * 360]  // start & end angles
   if (oneRot < a || oneRot > b) {
     // Not inside the winner, so determine how much more we need by finding
     // a random value between start and end
-    const ranAngle = Math.random() * (b - a) + a
-    // Decide how much to add to oneRot to get to ranAngle, then do that to
-    // rotationTot instead, computing a duration that gets us to the new total.
-    spin.duration = timeFromRotation(spin.duration, spin.spinSpeed, 
-                                     rotationTot + (ranAngle - oneRot))
+    const rangle = Math.random() * (b - a) + a
+    // Decide how much to add to oneRot to get to rangle, then do that to
+    // rotTot instead, computing a duration that gets us to the new total.
+    so.duration = timeFromRotation(so.duration, so.spinSpeed, 
+                                                    rotTot + (rangle - oneRot))
   }
-	spin_anim(spin)
+	spin_anim(so)
 }
 
 // Snap to the final destination (which should be close enough to where the 
 // animation is that there's no visible snapping) and draw a bolder outline 
 // around the winning pie slice.
-function spinstop(spin) {
-  spin.degree = totalRotation(spin.duration, spin.tini, spin.spinSpeed)
-  spin.obj.style.transform = `rotate(-${mod(spin.degree, 360)}deg)`
-  const win = spin.slots[spin.windex]
+function spinstop(so) {
+  so.degree = totalRotation(so.duration, so.tini, so.spinSpeed)
+  so.obj.style.transform = `rotate(-${mod(so.degree, 360)}deg)`
+  const win = so.slots[so.windex]
   const p = win.weight
   let [a, b] = [(win.kyoom - p) * 360, win.kyoom * 360]  // start & end angles
   if (p > 1-1e-4) { a = 0; b = 360 - 1e-4 }
-  spin.obj.innerHTML += `<path d="${arcPath(50,50, 5, 50, a, b)}" ` +
+  so.obj.innerHTML += `<path d="${arcPath(50,50, 5, 50, a, b)}" ` +
                            `fill="#00000000" stroke="white" stroke-width="2" />`
 }
 
@@ -198,23 +194,19 @@ function fontblurb(x) {
   return `font-family="Arial" font-style="bold" font-size="${fs}" `
 }
 
-const alignblurb = 'alignment-baseline="central" text-anchor="middle" '
-const strokeblurb = 'stroke="#000000" stroke-width="1" opacity="0.3" '
-
 // Take a slot object and generate the svg blurb
 function arcblurb(slot) {
-  CLOG(`DEBUG: arcblurb slot=${JSON.stringify(slot)}`)
+  //CLOG(`DEBUG: arcblurb slot=${JSON.stringify(slot)}`)
   const p = slot.weight                        // probability ie fraction of pie
   let [a, b] = [(slot.kyoom - p) * 360, slot.kyoom * 360]  // start & end angles
   // Things break if we try to draw an arc from exactly 0 to 360 degrees, those
   // being the same thing, so adjust to 0 to 359.999 in that case.
   // But also for some buggy reason, things like .00001 degrees to 360 degrees
-  // also break so we're just drawing the whole circle if a pie slice is close
-  // enough to p=1.
+  // also break (?) so we're just drawing basically the whole circle if a pie
+  // slice is close enough to p=1.
   if (p > 1-1e-4) { a = 0; b = 360 - 1e-4 }
   return `<path d="${arcPath(50,50, 5,50, a, b)}" fill="${slot.color}" />`
-  // We can just make an arc from 0 to almost-360 degrees so no need for this
-  // special case:
+  // PS: we can just make a 0-359.9 degree arc so no need for this special case:
   // `<circle cx="50" cy="50" r="50" fill="${color}"/>` +
   // `<circle cx="50" cy="50" r="5"  fill="white"/>`
 }
@@ -222,36 +214,22 @@ function arcblurb(slot) {
 // Take angle in degrees and x,y coordinates, return svg blurb for the rotation
 function rotateblurb(d, x, y) { return `transform="rotate(${d}, ${x}, ${y})"` }
 
-function spindraw(spin) {
-  const totweight = spin.slots.reduce((a, b) => a + b.weight, 0)
-  if (abs(totweight - 1) > 1e-9) {
-    CLOG(`TODO: ASSERT: slot weights sum to ${totweight} (should be 1)`)
-    alert(`Slot weights sum to ${totweight} (should be 1)`)
-  }
-  const weights = spin.slots.map(i => i.weight)
-  const textOffset = spin.slots.length <= 4 ? 35 : 45
-
+// Draw or redraw the given spin object
+function spindraw(so) {
+  //const totweight = so.slots.reduce((a, b) => a + b.weight, 0)
+  //ASSERT(abs(totweight-1) < 1e-9, `Slot weights sum to ${totweight} not 1`)
+  const textOffset = so.slots.length <= 4 ? 35 : 45
   let svg = ''
-  for (let i = 0, ang = 0; i < spin.slots.length; i++) {
-    const p = weights[i]            // probability of this slot
-    if (p === 0) continue
-    const degDelta = 360*p          // number of degrees in this wedge
-    const midAngle = ang+degDelta/2 // draw the text in the middle of the arc
-    const tc = polarToCartesian(50, 50, textOffset, midAngle) // text coords
-    const rotateblurb = `transform="rotate(${midAngle}, ${tc.x}, ${tc.y})"`
-    svg += arcblurb(spin.slots[i]) +
-           `<text x="${tc.x}" y="${tc.y}" fill="white" ` +
-                  fontblurb(p) + alignblurb + rotateblurb + '>' +
-              spin.slots[i].value + '</text>'
-    ang += degDelta
+  for (let i = 0; i < so.slots.length; i++) {
+    const p = so.slots[i].weight                     // probability of this slot
+    const a = (so.slots[i].kyoom - p/2) * 360               // middle of the arc
+    const tc = polarToCartesian(50, 50, textOffset, a)      // text coords
+    svg += arcblurb(so.slots[i]) +
+           `<text x="${tc.x}" y="${tc.y}" fill="white" ` + fontblurb(p) +
+                  'alignment-baseline="central" text-anchor="middle" ' +
+                  `${rotateblurb(a, tc.x, tc.y)}>${so.slots[i].value}</text>`
   }
-  spin.obj.innerHTML = svg
-}
-
-function spinup(spin, slots) {
-  spin.slots = slots
-  if (spin.slots.length < 2) throw "You must specify at least two options"
-  spindraw(spin)
+  so.obj.innerHTML = svg
 }
 
 // Create an svg directly in the div, initialize and return the spinner object
@@ -274,13 +252,14 @@ function spinit(div, slots) {
     rand_speed: 0,
     duration: 0,
   }
-  spinup(so, slots)
+  spindraw(so)
   return so
 }
 
-// Generate a list of slots from a probability or list of probabilities.
-// For the case of 2 slots the first is for yes/pay/high/green and the second
-// is for no/free/low/red.
+// Generate a list of slots from a probability (just need one probability for
+// two slots) or a list of probabilities that sum to one.
+// For the case of 2 slots in Expectorant, the first slot is for
+// yes/pay/high/green and the second is for no/free/low/red.
 function genslots(p) {
   if (Array.isArray(p)) { 
     ASSERT(false, "More than 2 slots not supported yet")

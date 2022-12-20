@@ -32,12 +32,12 @@
 <div class="wrapper"> <!-- wrapper and content divs set margins/positioning -->
 <div class="content" role="main">
 
-<h1>Expectorant <span class='versiontag'>v2022.12.19c</span></h1>
+<h1>Expectorant <span class='versiontag'>v2022.12.19f</span></h1>
 
 <p>
-<input id="expr" type="text" size="38"
-  placeholder="Expression that evaluates to a probability" />
-&nbsp; <span id="probpre">p=</span><span id="prob">0%</span>
+<input id="expr" type="text" size="100"
+       placeholder="Expression that evaluates to a probability" />
+<br/><span id="probpre">p=</span><span id="prob">0%</span>
 <br/>
 <center>
   <button id="expectorize" class="pushable">
@@ -103,7 +103,8 @@ $('expr').addEventListener('input', e => {
   try {
     const p = parsefrac(desugar(e.target.value))
     $('prob').innerHTML = p
-    spinup(spinzo, genslots(p))
+    spinzo.slots = genslots(p)
+    spindraw(spinzo)
   } catch (error) {
     CLOG("Oh hi, I haven't found a way to ever reach this code. Did you?")
     CLOG(`DEBUG: ${JSON.stringify(error)}`)
@@ -115,7 +116,7 @@ $('expectorize').addEventListener('click', e => { expectorize(spinzo) })
 
 $('expr').addEventListener("keyup", e => {
   if (e.key === "Enter") {
-    $('expectorize').click()  // generate a click of the expectorize button
+    $('expectorize').click()
   }
 })
 
