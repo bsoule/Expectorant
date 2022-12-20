@@ -1,7 +1,7 @@
 /* Here we provide the following functions for spinning a spinner:
 1. genslots: generate the list of slots aka pie slices
 2. spinit: initialize spinner with a div and list of slots, return a spin object
-3. spingo: make the spinner respresented by the given spin object start spinning
+3. spingo: set the target and start spinning
 4. spindraw: draw or redraw the spinner for the given spin object
 */
 
@@ -50,53 +50,11 @@ function arcPath(x, y, radius, endradius, startAngle, endAngle) {
   ].join(' ')
 }
 
-/* 
-The following describes motion as a function of time, t, such that the
-distance is 0 when t=0 and is B when t=T:
-
-DIST:      (2*T*t - t^2) * B/T^2
-SPEED:     2*B*(T-t)/T^2
-INITSPEED: 2*B/T          (that's twice the average speed of B/T)
-
-In other words, the speed drops linearly over an amount of time T covering a 
-distance B. That's what a projectile thrown in the air does as it comes to a 
-stop at the apex due to gravity.
-
-But the following may be more suspenseful, with the spinner asymptotically 
-coming to rest but never quite doing so, until the movement is imperceptible:
-
-DIST:      B*(1 - d^(t/T))
-SPEED:     -B/T * log(d) * d^(t/T)
-INITSPEED: -B * log(d) / T
-
-where d>0 is a parameter giving the tolerance -- something like 0.01 -- for how
-close to B the distance function gets by time T. In other words, d is like the
-tolerance on what counts as stopped.
-
-
-And for posterity, here's a sine-based easing function we found on the internet
-but it's pretty annoying to work with:
-
-function rotationFromTime(duration, tini, startSpeed, tcur) {
-  const t = tcur - tini
-  return startSpeed * 
-    (duration*cos(TAU/4 * t / duration)/(TAU/4) + duration + t) - 
-      startSpeed * duration * (4/TAU + 1)
-}
-
-function speedFromTime(duration, tini, startSpeed, tcur) {
-  const t = tcur - tini
-  return -cos((1 - t/duration) * TAU/4) * startSpeed + startSpeed
-}
-*/
-
-// How far the spinner (spin object so) has spun in total degrees as of now
-function dist(so) {
-  const t = Date.now() - so.tini  // milliseconds since spinner started spinning
-  const T = so.tdel               // total time the spinner is gonna spin
-  const D = so.dtot               // total distance the spinner is gonna spin
-  return (2*T*t - t**2) * D/T**2
-}
+// Total degrees the spinner spins by time t if it does D by time T
+// (See the end of this file for the math of this)
+function dist(t, T, D) 
+{ return 2*D/T * t - D/T**2 * t**2 } // constant accel.
+//{ return D/T * t } // constant velocity
 
 // Stop a tiny bit before the real target so it snaps into place?
 function totalRotation(duration, tini, startSpeed) {
@@ -123,6 +81,12 @@ function speedFromTime(duration, tini, startSpeed, tcur) {
 
 // Execute the animation frame using css
 function spin_anim(so) {
+  const t = Date.now()
+  if (t >= so.tini + so.tdel) { setTimeout(spinstop(so), 0); return true }
+  so.dcur = dist(t-so.tini, so.tdel, so.dtot)
+  so.obj.style.transform = `rotate(-${mod(so.dcur, 360)}deg)`
+	requestAnimFrame(() => spin_anim(so)) // curried version of spin_anim? why?
+  /*
   if (so.speed < 0.01) { setTimeout(spinstop(so), 0); return true }
   const t = Date.now()
   so.speed = speedFromTime(so.duration, so.tini, so.spinSpeed, t)
@@ -130,12 +94,21 @@ function spin_anim(so) {
   so.degree = rotationFromTime(so.duration, so.tini, so.spinSpeed, t)
   so.obj.style.transform = `rotate(-${mod(so.degree, 360)}deg)`
 	requestAnimFrame(() => spin_anim(so)) // curried version of spin_anim? why?
+  */
 }
 
 // Snap to the final destination (which should be close enough to where the 
 // animation is that there's no visible snapping) and draw a bolder outline 
 // around the winning pie slice.
 function spinstop(so) {
+  so.obj.style.transform = `rotate(-${mod(so.dtot, 360)}deg)`
+  const win = so.slots[so.windex]
+  const p = win.weight
+  let [a, b] = [(win.kyoom - p) * 360, win.kyoom * 360]  // start & end angles
+  if (p > 1-1e-4) { a = 0; b = 360 - 1e-4 }
+  so.obj.innerHTML += `<path d="${arcPath(50,50, 5, 50, a, b)}" ` +
+                           `fill="#00000000" stroke="white" stroke-width="2" />`
+  /*
   so.degree = totalRotation(so.duration, so.tini, so.spinSpeed)
   so.obj.style.transform = `rotate(-${mod(so.degree, 360)}deg)`
   const win = so.slots[so.windex]
@@ -144,6 +117,7 @@ function spinstop(so) {
   if (p > 1-1e-4) { a = 0; b = 360 - 1e-4 }
   so.obj.innerHTML += `<path d="${arcPath(50,50, 5, 50, a, b)}" ` +
                            `fill="#00000000" stroke="white" stroke-width="2" />`
+  */
 }
 
 // Set the winner and start spinning the given spinner object
@@ -151,16 +125,15 @@ function spingo(so, windex) {
   ASSERT(windex >= 0 && windex < so.slots.length, 
     `Can't take slot ${windex} of ${JSON.stringify(so.slots)}`)
   so.windex = windex
-  
-  // compute dtot
-/*
+  so.tini = Date.now()
+  const win = so.slots[windex]
+  const p = win.weight
   let [a, b] = [(win.kyoom - p) * 360, win.kyoom * 360]    // start & end angles
   const rangle = Math.random() * (b - a) + a  // random angle pointing to winner
-  so.dtot = rangle + 0*360 // probably a few more extra spins than this?
+  so.dtot = rangle + 5*360 // a bunch of extra rotations; adjust to taste
+  //CLOG(`DEBUG: ${JSON.stringify(so)}`)
   spin_anim(so)
-  return
-*/
-
+  /*
   so.degree = 0
   so.obj.style.transform = `rotate(-${so.degree}deg)`
   so.tini = Date.now()
@@ -188,6 +161,7 @@ function spingo(so, windex) {
                                                     rotTot + (rangle - oneRot))
   }
 	spin_anim(so)
+  */
 }
 
 // Take the weight (probability) of the pie slice and make the font blurb
@@ -240,8 +214,8 @@ function spinit(div, slots) { return {
   obj:    div.querySelector('svg'),
   slots:  slots,                  // list of slots (see genslots)
   windex: -1,                     // index of the winning slot
-  tini:   Date.now(),             // initial timestamp, when spinning starts
-  tdel:   4500,                   // total duration of the spin, in milliseconds
+  tini:   -1,                     // initial timestamp, when spinning starts
+  tdel:   4450,                   // total duration of the spin, in milliseconds
   dtot:   -1,                     // total distance in degrees it's gonna spin
   dcur:   0,                      // current distance in degrees it has spun
   // ------------------------ we should be able to get rid of everything below
@@ -276,3 +250,81 @@ function genslots(p) {
 }
 
 // -----------------------------------------------------------------------------
+
+/* THE MATH
+None of this is specific to a spinning spinner, we just treat total degrees 
+traveled as a distance metric. Typically the spinner makes several full
+rotations so that just means the total distance traveled is more than a few
+multiples of 360. The constraint for the spinner is that we stop the animation
+when the velocity (that's the derivative of the distance function) hits zero.
+
+Here's the distance function for a projectile starting at distance 0:
+
+dist(t) = v0*t + 1/2*a*t^2
+
+where v0 is the initial velocity and a is the acceleration.
+
+Now add two constraints: 
+
+1. After a known amount of time T we reach a known distance D
+2. The velocity is zero at time T
+
+That's what we want for our spinner. We decide where we want it to land which
+implies a total distance it will travel (throw in a few extra full rotations
+for suspensefulness) and we want it to come to rest when the beep-boop sound
+effect stops.
+
+Writing those constraints as equations gives this:
+
+1. D = v0*T + 1/2*a*T^2
+2. v0 + a*t = 0
+
+So we just solve those for initial velocity v0 and acceleration a in terms of
+the known values D and T. Algebra algebra, and:
+
+v0 = 2*D/T
+a = -2*D/T^2
+
+Now we put those into our distance equation to get distance in terms of just 
+the things we know:
+
+dist(t) = 2*D/T * t - D/T^2 * t^2
+
+We don't need the velocity explicitly but here it is, just differentiating
+distance with respect to time:
+
+velo(t) = 2*D/T - 2*D/T^2 * t
+
+Another random thing to notice is that the average speed is D/T and the initial
+speed is 2*D/T and of course the final speed is 0.
+
+In other words, the speed drops linearly over an amount of time T covering a 
+distance D.
+
+But now let's consider more suspenseful distance functions! Here's one where the
+spinner asymptotically comes to rest but never quite does so, until the movement
+is imperceptible:
+
+dist(t) = D*(1 - k^(t/T))
+velo(t) = -D/T * log(k) * k^(t/T)
+
+where k>0 is a parameter giving the tolerance -- something like 0.01 -- for how
+close to D the distance function gets by time T. In other words, k is like the
+tolerance on what counts as stopped.
+
+
+And for posterity, here's a sine-based easing function we found on the internet
+but it's pretty annoying to work with:
+
+function rotationFromTime(duration, tini, startSpeed, tcur) {
+  const t = tcur - tini
+  return startSpeed * 
+    (duration*cos(TAU/4 * t / duration)/(TAU/4) + duration + t) - 
+      startSpeed * duration * (4/TAU + 1)
+}
+
+function speedFromTime(duration, tini, startSpeed, tcur) {
+  const t = tcur - tini
+  return -cos((1 - t/duration) * TAU/4) * startSpeed + startSpeed
+}
+*/
