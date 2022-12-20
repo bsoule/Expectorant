@@ -55,7 +55,8 @@ function arcPath(x, y, radius, endradius, startAngle, endAngle) {
 function dist(t, T, D) {
   //return D/T * t // constant velocity (simplest but doesn't look good)
   //return 2*D/T * t - D/T**2 * t**2  // constant acceleration (like gravity!)
-  return D*(1 - 0.0002**(t/T)) // exponential decay, never quiiiiite stops
+  //return D*(1 - 0.0002**(t/T)) // exponential decay, never quiiiiite stops
+  return D*sin(t*TAU/4/T) // sine-based easing like we found on the internet
 }
 
 // Execute the animation frame using css

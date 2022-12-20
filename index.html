@@ -32,7 +32,7 @@
 <div class="wrapper"> <!-- wrapper and content divs set margins/positioning -->
 <div class="content" role="main">
 
-<h1>Expectorant <span class='versiontag'>v2022.12.20h</span></h1>
+<h1>Expectorant <span class='versiontag'>v2022.12.20i</span></h1>
 
 <p>
 <input id="expr" type="text" size="80"
@@ -77,8 +77,8 @@ function expectorize(so) {
   $('audiotag1').play()
   spindraw(so)
   const p = so.slots[0].weight // probability for first slot ie YES
-  //CLOG("WARNING: Flipped the probs from [p,1-p] to [1-p,p] for testing!")
-  const windex = spinpick([0, 1], [p, 1-p]) // land on slot 0 with probability p
+  CLOG("WARNING: Flipped the probs from [p,1-p] to [1-p,p] for testing!")
+  const windex = spinpick([0, 1], [1-p, p]) // land on slot 0 with probability p
   if (p === lastp) {
     yeses += windex === 0 ? 1 : 0
     trials += 1
