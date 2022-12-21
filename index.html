@@ -33,7 +33,7 @@
 <div class="content" role="main">
 
 <h1>Expectorant</h1>
-<div class='versiontag'>v2022.12.20pol</div>
+<div class='versiontag'>v2022.12.21b</div>
 
 <p>
 <input id="expr" type="text" size="80"
@@ -98,17 +98,16 @@ document.addEventListener('DOMContentLoaded', () => {          // document-ready
 
 $('expr').focus()
 $('prob').innerHTML = INITPROB
-const spinzo = spinit(document.querySelector('#spinneroo'), genslots(INITPROB))
-spindraw(spinzo)
+const spob = spinit(document.querySelector('#spinneroo'), genslots(INITPROB))
+spindraw(spob)
   
 // Update the slots and redraw the spinner on every keystroke in the input field
 $('expr').addEventListener('input', e => {
   try {
     const p = parsefrac(desugar(e.target.value))
     $('prob').innerHTML = p
-    // spinup(spinzo, genslots(p))
-    spinzo.slots = genslots(p)
-    spindraw(spinzo)
+    spob.slots = genslots(p)
+    spindraw(spob)
   } catch (error) {
     CLOG("Oh hi, I haven't found a way to ever reach this code. Did you?")
     CLOG(`DEBUG: ${JSON.stringify(error)}`)
@@ -116,13 +115,13 @@ $('expr').addEventListener('input', e => {
   }
 })
 
-$('expectorize').addEventListener('click', e => { expectorize(spinzo) })
-
-$('expr').addEventListener("keyup", e => {
-  if (e.key === "Enter") { expectorize(spinzo) }
+$('expectorize').addEventListener('click', e => expectorize(spob))
+$('spinneroo')  .addEventListener('click', e => expectorize(spob))
+$('expr').addEventListener('keyup', e => {
+  if (e.key==="Enter") expectorize(spob)
 })
-$('expr').addEventListener("keydown", e => {
-  if (e.metaKey && e.key === "Enter") { expectorize(spinzo) }
+$('expr').addEventListener('keydown', e => {
+  if (e.metaKey && e.key === "Enter") expectorize(spob)
 })
 
 })                                                         // end document-ready
@@ -182,7 +181,9 @@ Oh, and if 3 people split the $10 pickled monkey balls just treat it as 3 items,
 
 <p>
 Built by Christopher Moravec, Bethany Soule, and Daniel Reeves.
-Thanks to Dave Pennock who invented the original algorithm.
+Based on an Android app that Soule and Reeves published in 2010 (!) and that's 
+technically still in Google's app store but doesn't work on modern phones.
+Thanks to Dave Pennock who invented the restaurant bill-splitting algorithm.
 See 
 <a href="http://messymatters.com/expectorant" title="Stochastic, Nerdtastic Restaurant Bill Splitting on Danny and Sharad's old Messy Matters blog">the original blog post</a>
 for more.

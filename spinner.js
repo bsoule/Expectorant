@@ -15,8 +15,8 @@ const KBER = .96     // Bernoulli (different Bernoulli, probably) parameter
 const KPOL = 3      // parameter giving the polynomial degree
 const BOOP = 4400  // length of the audio clip in milliseconds
 const SUSP = 500  // extra milliseconds after beep-boop stops till spinner stops
-const YAYCOLOR = 'hsl(159deg 53% 28%)'
-const NAYCOLOR = 'hsl(356deg 70% 51%)'
+const YAYCOLOR = 'hsl(159deg 53% 28%)' // green for YES pie slice
+const NAYCOLOR = 'hsl(356deg 70% 51%)' // red for NO pie slice
 
 // -----------------------------------------------------------------------------
 
@@ -38,14 +38,14 @@ window.requestAnimFrame = (function() {
 })()
 
 // Easing function ie normalized distance: d from 0 to 1 as t goes from 0 to 1.
-// See https://easings.net for a collection of easing functions.
+// See the bottom of this file for more on the math of this.
 function ease(t) {
   //return t                   // linear / constant velocity (looks horrible)
   //return t*(2-t)             // constant acceleration (like gravity!)
   //return 1-KEXP**(t)         // exponential decay, never quiiiiite stops
   //return sin(t*TAU/4)        // what the spinner we found on the internet used
   return 1-(1-t)**KPOL       // KPOL=2 is quadratic, 3 is cubic, etc
-  //return sqrt(1-(1-t)**2)    // circular easing function
+  //return sqrt(1-(1-t)**2)    // circular easing function, why not
   //return t**.2               // power easing function
   //return t*KBER/(1-t+KBER*(2*t-1)) // Bernoulli easing function  
   //return 2**(-10*t)*sin((t*10-0.75)*TAU/3)+1    // bouncy!
@@ -54,7 +54,6 @@ function ease(t) {
 }
 
 // Total degrees the spinner spins by time t if it does D by time T.
-// See the end of this file for the math of this.
 function dist(t, T, D) { return D*ease(t/T) }
 
 // Javascript's % operator is not actually mod but remainder so we have to
@@ -87,39 +86,39 @@ function arcPath(x, y, radius, endradius, startAngle, endAngle) {
 }
 
 // Execute the animation frame using css
-function spin_anim(so) {
+function spin_anim(spob) {
   const t = Date.now()
-  if (t >= so.tini + so.tdel) { setTimeout(spinstop(so), 0); return true }
-  so.dcur = dist(t-so.tini, so.tdel, so.dtot)
-  so.obj.style.transform = `rotate(-${mod(so.dcur, 360)}deg)`
-	requestAnimFrame(() => spin_anim(so)) // curried version of spin_anim? why?
+  if (t >= spob.tini + spob.tdel) { setTimeout(spinstop(spob), 0); return true }
+  spob.dcur = dist(t-spob.tini, spob.tdel, spob.dtot)
+  spob.domo.style.transform = `rotate(-${mod(spob.dcur, 360)}deg)`
+	requestAnimFrame(() => spin_anim(spob)) // curried version of spin_anim? why?
 }
 
 // Snap to the final destination (which should be close enough to where the 
 // animation is that there's no visible snapping) and draw a bolder outline 
 // around the winning pie slice.
-function spinstop(so) {
-  so.obj.style.transform = `rotate(-${mod(so.dtot, 360)}deg)`
-  const win = so.slots[so.windex]
+function spinstop(spob) {
+  spob.domo.style.transform = `rotate(-${mod(spob.dtot, 360)}deg)`
+  const win = spob.slots[spob.windex]
   const p = win.weight
   let [a, b] = [(win.kyoom - p) * 360, win.kyoom * 360]  // start & end angles
   if (p > 1-1e-4) { a = 0; b = 360 - 1e-4 }
-  so.obj.innerHTML += `<path d="${arcPath(50,50, 5, 50, a, b)}" ` +
+  spob.domo.innerHTML += `<path d="${arcPath(50,50, 5, 50, a, b)}" ` +
                            `fill="#00000000" stroke="white" stroke-width="2" />`
 }
 
 // Set the winner and start spinning the given spinner object
-function spingo(so, windex) {
-  ASSERT(windex >= 0 && windex < so.slots.length, 
-    `Can't take slot ${windex} of ${JSON.stringify(so.slots)}`)
-  so.windex = windex
-  so.tini = Date.now()
-  const win = so.slots[windex]
+function spingo(spob, windex) {
+  ASSERT(windex >= 0 && windex < spob.slots.length, 
+    `Can't take slot ${windex} of ${JSON.stringify(spob.slots)}`)
+  spob.windex = windex
+  spob.tini = Date.now()
+  const win = spob.slots[windex]
   const p = win.weight
   let [a, b] = [(win.kyoom - p) * 360, win.kyoom * 360]    // start & end angles
   const rangle = Math.random() * (b - a) + a  // random angle pointing to winner
-  so.dtot = rangle + DROT*360 // a bunch of extra rotations; adjust to taste
-  spin_anim(so)
+  spob.dtot = rangle + DROT*360   // a bunch of extra rotations; adjust to taste
+  spin_anim(spob)
 }
 
 // Take the weight (probability) of the pie slice and make the font blurb
@@ -150,32 +149,32 @@ function arcblurb(slot) {
 function rotateblurb(d, x, y) { return `transform="rotate(${d}, ${x}, ${y})"` }
 
 // Draw or redraw the given spin object
-function spindraw(so) {
-  //const totweight = so.slots.reduce((a, b) => a + b.weight, 0)
+function spindraw(spob) {
+  //const totweight = spob.slots.reduce((a, b) => a + b.weight, 0)
   //ASSERT(abs(totweight-1) < 1e-9, `Slot weights sum to ${totweight} not 1`)
-  const textOffset = so.slots.length <= 4 ? 35 : 45
+  const textOffset = spob.slots.length <= 4 ? 35 : 45
   let svg = ''
-  for (let i = 0; i < so.slots.length; i++) {
-    const p = so.slots[i].weight                     // probability of this slot
-    const a = (so.slots[i].kyoom - p/2) * 360               // middle of the arc
+  for (let i = 0; i < spob.slots.length; i++) {
+    const p = spob.slots[i].weight                   // probability of this slot
+    const a = (spob.slots[i].kyoom - p/2) * 360             // middle of the arc
     const tc = polarToCartesian(50, 50, textOffset, a)      // text coords
-    svg += arcblurb(so.slots[i]) +
+    svg += arcblurb(spob.slots[i]) +
            `<text x="${tc.x}" y="${tc.y}" fill="white" ` + fontblurb(p) +
                   'alignment-baseline="central" text-anchor="middle" ' +
-                  `${rotateblurb(a, tc.x, tc.y)}>${so.slots[i].value}</text>`
+                  `${rotateblurb(a, tc.x, tc.y)}>${spob.slots[i].value}</text>`
   }
-  so.obj.innerHTML = svg
+  spob.domo.innerHTML = svg
 }
 
 // Initialize and return a fresh spinner object
 function spinit(div, slots) { return {
-  obj:    div.querySelector('svg'),
-  slots:  slots,                  // list of slots (see genslots)
-  windex: -1,                     // index of the winning slot
-  tini:   -1,                     // initial timestamp, when spinning starts
-  tdel:   BOOP+SUSP,              // spin duration (ms); adjust to taste
-  dtot:   -1,                     // total distance in degrees it's gonna spin
-  dcur:   0,                      // current distance in degrees it has spun
+  domo:   div.querySelector('svg'), // DOM object for the spinner
+  slots:  slots,                    // list of slots (see genslots)
+  windex: -1,                       // index of the winning slot
+  tini:   -1,                       // initial timestamp, when spinning starts
+  tdel:   BOOP+SUSP,                // spin duration (ms); adjust to taste
+  dtot:   -1,                       // total distance in degrees it's gonna spin
+  dcur:   0,                        // current distance in degrees it has spun
 }}
 
 // Generate a list of slots from a probability (just need one probability for
@@ -263,4 +262,6 @@ tolerance on what counts as stopped.
 PS: It's easier to do all of the above where T=1 and D=1 and then just rescale.
 So if we have a normalized distance function d(t) that hits distance 1 at time 1
 then we can just do D*d(t/T) to get the version that hits distance D at time T.
+The (0,0) to (1,1) version is called an easing function and there's a nice 
+library of ones to try at easings.net.
 */

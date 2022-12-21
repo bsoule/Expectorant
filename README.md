@@ -10,6 +10,7 @@ Pennock of, appropriately, oddhead.com.
 ## Changelog
 
 <pre>
+2022-12-21: Polished up, better colors, better easing function for the spinner
 2022-12-04: A spinner!
 2022-10-23: Lets you enter a probability but doesn't do anything with it
 2017-08-05: Dummy version on Glitch
