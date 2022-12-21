@@ -1,5 +1,13 @@
 :root {
-  --color-bg: #69F7BE;
+  --color-bg: #f4f0bb;
+}
+
+.thing{
+color: #da2c38
+#43291f
+#f4f0bb
+#226f54
+#87c38f
 }
 
 /*
@@ -21,16 +29,20 @@
 
 body {
   font-family: HK Grotesk;
+  color: hsl(17deg 13% 19%);
   background-color: var(--color-bg);
 }
 
 h1 {
-  color: #2800FF;
+  color: hsl(17deg 13% 19%);
 }
 
 .versiontag {
-  color:gray; 
+  color: hsla(17deg 13% 19% 20%);
   font-size: 9px;
+  position: fixed;
+  bottom: 0;
+  right: 0;
 }
 
 input { 
@@ -39,10 +51,10 @@ input {
   font-size: 16pt;
   width: 81%;
 }
-
+/*
 #prob    { color: #999999; }
 #probpre { color: #999999; }
-
+*/
 .content {
   display: flex;
   flex-direction: column;
@@ -51,7 +63,7 @@ input {
 }
 
 .pushable {
-  background: hsl(340deg 100% 32%);
+  background: hsl(159deg 53% 28%);
   border-radius: 12px;
   border: none;
   padding: 0;
@@ -63,8 +75,8 @@ input {
   padding: 12px 42px;
   border-radius: 12px;
   font-size: 1.25rem;
-  background: hsl(345deg 100% 47%);
-  color: white;
+  background: hsl(128deg 33% 65%);
+  /*color: white;*/
   transform: translateY(-6px);
 }
 .pushable:active .front {

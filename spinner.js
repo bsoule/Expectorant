@@ -9,10 +9,14 @@ it way better.
 */
 
 // Config constants; see also ease() to pick the easing function
-const DROT = 10    // number of extra full rotations before landing on winner
-const KEXP = .0005 // exponential decay parameter
+const DROT = 4      // number of extra full rotations before landing on winner
+const KEXP = .001/DROT // exponential decay parameter
+const KBER = .96     // Bernoulli (different Bernoulli, probably) parameter
+const KPOL = 3      // parameter giving the polynomial degree
 const BOOP = 4400  // length of the audio clip in milliseconds
 const SUSP = 500  // extra milliseconds after beep-boop stops till spinner stops
+const YAYCOLOR = 'hsl(159deg 53% 28%)'
+const NAYCOLOR = 'hsl(356deg 70% 51%)'
 
 // -----------------------------------------------------------------------------
 
@@ -34,19 +38,16 @@ window.requestAnimFrame = (function() {
 })()
 
 // Easing function ie normalized distance: d from 0 to 1 as t goes from 0 to 1.
-// See https://easings.net/ for a collection of easing functions.
+// See https://easings.net for a collection of easing functions.
 function ease(t) {
-  //return t                // linear / constant velocity (looks horrible)
-  //return t*(2-t)          // constant acceleration (like gravity!)
-  //return 1-KEXP**(t)      // exponential decay, never quiiiiite stops
-  //return sin(t*TAU/4)     // what the spinner we found on the internet used
-  //return 1-(1-t)**2       // quadratic (stops too suddenly)
-  //return 1-(1-t)**3       // cubic (decent)
-  return 1-(1-t)**4       // quartic (pretty nice)
-  //return 1-(1-t)**5       // quintic (maybe stops too soon)
-  //return 1-(1-t)**6       // sextic (about the same as quintic I think)
-  //return 1-(1-t)**7       // septic? (maybe stops too soon)
-  //return sqrt(1-(t-1)**2) // circular easing function
+  //return t                   // linear / constant velocity (looks horrible)
+  //return t*(2-t)             // constant acceleration (like gravity!)
+  //return 1-KEXP**(t)         // exponential decay, never quiiiiite stops
+  //return sin(t*TAU/4)        // what the spinner we found on the internet used
+  return 1-(1-t)**KPOL       // KPOL=2 is quadratic, 3 is cubic, etc
+  //return sqrt(1-(1-t)**2)    // circular easing function
+  //return t**.2               // power easing function
+  //return t*KBER/(1-t+KBER*(2*t-1)) // Bernoulli easing function  
   //return 2**(-10*t)*sin((t*10-0.75)*TAU/3)+1    // bouncy!
   //return t<0.5 ? 8*t**4 : 1-pow(-2*t+2, 4)/2 // easeInOutQuart
   //return t<0.5 ? 2*t**2 : 1-pow(-2*t+2, 2)/2 // easeInOutQuad
@@ -193,8 +194,8 @@ function genslots(p) {
     ]
   }
   return [
-    { value: percentify(p),   weight: p,   kyoom: p, color: 'green' },
-    { value: percentify(1-p), weight: 1-p, kyoom: 1, color: 'red'   },
+    { value: percentify(p),   weight: p,   kyoom: p, color: YAYCOLOR },
+    { value: percentify(1-p), weight: 1-p, kyoom: 1, color: NAYCOLOR },
   ]  
 }
 
