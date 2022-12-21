@@ -3,15 +3,27 @@
 2. spinit: initialize spinner with a div and list of slots, return a spin object
 3. spingo: set the target and start spinning
 4. spindraw: draw or redraw the spinner for the given spin object
+
+Some of this code is based on http://jsfiddle.net/PhilQ/c5etdjro/8/ but we made
+it way better.
 */
 
+// Config constants; see also ease() to pick the easing function
+const DROT = 10    // number of extra full rotations before landing on winner
+const KEXP = .0005 // exponential decay parameter
+const BOOP = 4400  // length of the audio clip in milliseconds
+const SUSP = 500  // extra milliseconds after beep-boop stops till spinner stops
+
 // -----------------------------------------------------------------------------
+
 const max = Math.max
 const min = Math.min
 const abs = Math.abs
 const sin = Math.sin
 const cos = Math.cos
 const TAU = 2*Math.PI
+const sqrt = Math.sqrt
+const pow = Math.pow // or use the ** operator
 
 // Shortcut to get the best animationFrame function
 window.requestAnimFrame = (function() {
@@ -20,6 +32,29 @@ window.requestAnimFrame = (function() {
          window.mozRequestAnimationFrame    ||
          function(callback) { window.setTimeout(callback, 1000 / 60) }
 })()
+
+// Easing function ie normalized distance: d from 0 to 1 as t goes from 0 to 1.
+// See https://easings.net/ for a collection of easing functions.
+function ease(t) {
+  //return t                // linear / constant velocity (looks horrible)
+  //return t*(2-t)          // constant acceleration (like gravity!)
+  //return 1-KEXP**(t)      // exponential decay, never quiiiiite stops
+  //return sin(t*TAU/4)     // what the spinner we found on the internet used
+  //return 1-(1-t)**2       // quadratic (stops too suddenly)
+  //return 1-(1-t)**3       // cubic (decent)
+  return 1-(1-t)**4       // quartic (pretty nice)
+  //return 1-(1-t)**5       // quintic (maybe stops too soon)
+  //return 1-(1-t)**6       // sextic (about the same as quintic I think)
+  //return 1-(1-t)**7       // septic? (maybe stops too soon)
+  //return sqrt(1-(t-1)**2) // circular easing function
+  //return 2**(-10*t)*sin((t*10-0.75)*TAU/3)+1    // bouncy!
+  //return t<0.5 ? 8*t**4 : 1-pow(-2*t+2, 4)/2 // easeInOutQuart
+  //return t<0.5 ? 2*t**2 : 1-pow(-2*t+2, 2)/2 // easeInOutQuad
+}
+
+// Total degrees the spinner spins by time t if it does D by time T.
+// See the end of this file for the math of this.
+function dist(t, T, D) { return D*ease(t/T) }
 
 // Javascript's % operator is not actually mod but remainder so we have to
 // force it to be positive. We use this to keep degrees in [0, 360).
@@ -48,15 +83,6 @@ function arcPath(x, y, radius, endradius, startAngle, endAngle) {
     "A", endradius, endradius, 0, largeArcFlag, 1, start2.x, start2.y,
     "Z",
   ].join(' ')
-}
-
-// Total degrees the spinner spins by time t if it does D by time T
-// (See the end of this file for the math of this)
-function dist(t, T, D) {
-  //return D/T * t // constant velocity (simplest but doesn't look good)
-  //return 2*D/T * t - D/T**2 * t**2  // constant acceleration (like gravity!)
-  //return D*(1 - 0.0002**(t/T)) // exponential decay, never quiiiiite stops
-  return D*sin(t*TAU/4/T) // sine-based easing like we found on the internet
 }
 
 // Execute the animation frame using css
@@ -91,7 +117,7 @@ function spingo(so, windex) {
   const p = win.weight
   let [a, b] = [(win.kyoom - p) * 360, win.kyoom * 360]    // start & end angles
   const rangle = Math.random() * (b - a) + a  // random angle pointing to winner
-  so.dtot = rangle + 5*360 // a bunch of extra rotations; adjust to taste
+  so.dtot = rangle + DROT*360 // a bunch of extra rotations; adjust to taste
   spin_anim(so)
 }
 
@@ -146,7 +172,7 @@ function spinit(div, slots) { return {
   slots:  slots,                  // list of slots (see genslots)
   windex: -1,                     // index of the winning slot
   tini:   -1,                     // initial timestamp, when spinning starts
-  tdel:   4400+500,               // spin duration (ms); adjust to taste
+  tdel:   BOOP+SUSP,              // spin duration (ms); adjust to taste
   dtot:   -1,                     // total distance in degrees it's gonna spin
   dcur:   0,                      // current distance in degrees it has spun
 }}
@@ -219,10 +245,8 @@ distance with respect to time:
 velo(t) = 2*D/T - 2*D/T^2 * t
 
 Another random thing to notice is that the average speed is D/T and the initial
-speed is 2*D/T and of course the final speed is 0.
-
-In other words, the speed drops linearly over an amount of time T covering a 
-distance D.
+speed is 2*D/T and of course the final speed is 0. In other words, the speed
+drops linearly over an amount of time T covering a distance D.
 
 But now let's consider more suspenseful distance functions! Here's one where the
 spinner asymptotically comes to rest but never quite does so, until the movement
@@ -235,19 +259,7 @@ where k>0 is a parameter giving the tolerance -- something like 0.01 -- for how
 close to D the distance function gets by time T. In other words, k is like the
 tolerance on what counts as stopped.
 
-
-And for posterity, here's a sine-based easing function we found on the internet
-but it's pretty annoying to work with:
-
-function rotationFromTime(duration, tini, startSpeed, tcur) {
-  const t = tcur - tini
-  return startSpeed * 
-    (duration*cos(TAU/4 * t / duration)/(TAU/4) + duration + t) - 
-      startSpeed * duration * (4/TAU + 1)
-}
-
-function speedFromTime(duration, tini, startSpeed, tcur) {
-  const t = tcur - tini
-  return -cos((1 - t/duration) * TAU/4) * startSpeed + startSpeed
-}
+PS: It's easier to do all of the above where T=1 and D=1 and then just rescale.
+So if we have a normalized distance function d(t) that hits distance 1 at time 1
+then we can just do D*d(t/T) to get the version that hits distance D at time T.
 */
