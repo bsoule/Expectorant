@@ -49,12 +49,15 @@ input {
   height: 24px;
   padding: 8px;
   font-size: 16pt;
-  width: 81%;
+  width: 95%;
+  max-width: 390px; /* enough for the placeholder text */
 }
-/*
+
+/* Bee doesn't like this being gray like this:
 #prob    { color: #999999; }
 #probpre { color: #999999; }
 */
+
 .content {
   display: flex;
   flex-direction: column;

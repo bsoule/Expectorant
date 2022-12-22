@@ -28,16 +28,32 @@
 </head>
 <body>
 
-<div class="wrapper"> <!-- wrapper and content divs set margins/positioning -->
-<div class="content" role="main">
+<div class="content">
+
+<div id="ancient-browser-warning"></div>
+<script>
+// -----------------------------------------------------------------------------
+function $(id) { return document.getElementById(id) }    // convenience function
+function ancient_browser_check() {
+  "use strict"                         // does this matter?
+  try { eval("let foo = (x)=>x+1") }   // feature detection: "let" & arrow funcs
+  catch (e) { return true }            // bad browser, not understanding ES6
+  return false                         // good browser, not being ancient
+}
+if (ancient_browser_check()) {
+  $('ancient-browser-warning').innerHTML = 
+    "<h1>Ancient browser warning: nothing's gonna work here!</h1>"
+}
+// -----------------------------------------------------------------------------
+</script>
 
 <h1>Expectorant</h1>
-<div class='versiontag'>v2022.12.21c</div>
+<div class='versiontag'>v2022.12.22a&nbsp;</div>
 
 <p>
 <input id="expr" type="text" size="80"
        placeholder="Expression that evaluates to a probability" />
-<br/><span id="probpre">p=</span><span id="prob">0%</span>
+<center id="probpre">p=</span><span id="prob">0%</center>
 <br/>
 <center>
   <button id="expectorize" class="pushable">
@@ -50,8 +66,7 @@
 </audio>
 </p>
 
-</div> <!-- end main -->
-</div> <!-- end wrapper -->
+</div> <!-- end content -->
 
 <div class="spin_container"> <!-- initially contains placeholder for spinner -->
   <div id="spinneroo" class="spin_wrapper">
@@ -61,7 +76,7 @@
 </div>
 
 <script>
-
+// -----------------------------------------------------------------------------
 const INITPROB = .5 // the probability the spinner is preloaded with
 
 const CLOG = console.log
@@ -104,7 +119,7 @@ spindraw(spob)
 $('expr').addEventListener('input', e => {
   try {
     const p = parsefrac(desugar(e.target.value))
-    $('prob').innerHTML = p
+    $('prob').innerHTML = p.toPrecision(8)
     spob.slots = genslots(p)
     spindraw(spob)
   } catch (error) {
@@ -124,7 +139,7 @@ $('expr').addEventListener('keydown', e => {
 })
 
 })                                                         // end document-ready
-
+// -----------------------------------------------------------------------------
 </script>
 
 <details>
