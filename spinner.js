@@ -9,14 +9,19 @@ it way better.
 */
 
 // Config constants; see also ease() to pick the easing function
-const DROT = 4      // number of extra full rotations before landing on winner
-const KEXP = .001/DROT // exponential decay parameter
-const KBER = .96     // Bernoulli (different Bernoulli, probably) parameter
-const KPOL = 3      // parameter giving the polynomial degree
-const BOOP = 4400  // length of the audio clip in milliseconds
+const DROT = 4        // number of extra full rotations before landing on winner
+const KEXP = .001/3   // exponential decay parameter
+const KBER = .96      // Bernoulli (different Bernoulli, probably) parameter
+const KPOL = 3.7      // parameter giving the polynomial degree
+const BOOP = 4400   // length of the audio clip in milliseconds
 const SUSP = 500  // extra milliseconds after beep-boop stops till spinner stops
 const YAYCOLOR = 'hsl(159deg 53% 28%)' // green for YES pie slice
 const NAYCOLOR = 'hsl(356deg 70% 51%)' // red for NO pie slice
+
+const SVGcX = 50 // x,y coordinates of the center of the spinner
+const SVGcY = 50
+const SVGr1 = 5  // radius of the little knob at the center of the spinner
+const SVGr2 = 50 // radius of the whole spinner
 
 // -----------------------------------------------------------------------------
 
@@ -53,45 +58,50 @@ function ease(t) {
   //return t<0.5 ? 2*t**2 : 1-pow(-2*t+2, 2)/2 // easeInOutQuad
 }
 
-// Total degrees the spinner spins by time t if it does D by time T.
+// Total degrees the spinner spins by time t if it does D by time T
 function dist(t, T, D) { return D*ease(t/T) }
 
 // Javascript's % operator is not actually mod but remainder so we have to
 // force it to be positive. We use this to keep degrees in [0, 360).
 function mod(x, m) { return (x % m + m) % m }
 
-// Convert Polar to Cartesian coordinates
-function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
-  const angleInRadians = (angleInDegrees-90)/360*TAU
-  return { x: centerX + (radius * cos(angleInRadians)),
-           y: centerY + (radius * sin(angleInRadians)) }
+// Take an x,y point, an angle in degrees d measuring counterclockwise from 
+// 12'o'clock (straight up), and radius r; return the x,y coordinates of the
+// point r units from x,y in direction d.
+function polarcart(x, y, r, d) {
+  const theta = (d-90)/360*TAU // angle in radians
+  return { x: x + (r * cos(theta)),
+           y: y + (r * sin(theta)) }
 }
 
-// Draw a pie slice that is one section of the spinner
-function arcPath(x, y, radius, endradius, startAngle, endAngle) {
-  const start  = polarToCartesian(x, y, radius, endAngle)
-  const end    = polarToCartesian(x, y, radius, startAngle)
-  const start2 = polarToCartesian(x, y, endradius, endAngle)
-  const end2   = polarToCartesian(x, y, endradius, startAngle)
-  const largeArcFlag = endAngle - startAngle <= 180 ? "0" : "1"
-  ASSERT(!isNaN(start.x) && !isNaN(start2.x) && !isNaN(end.x) &&! isNaN(end2.x),
-    `arcPath(${x}, ${y}, ${radius}, ${endradius}, ${startAngle}, ${endAngle})`)
+// Draw a pie slice from angle a to angle b
+function arcPath(a, b) {
+  // Call the intermediate points a1, a2, b1, b2 where the a's are at angle a
+  // the b's are at angle b and the 1's are at the inner radius and the 2's are
+  // at the outer radius. Eg, b1 is the point at angle b at the inner radius.
+  const a1 = polarcart(SVGcX, SVGcY, SVGr1, a)
+  const a2 = polarcart(SVGcX, SVGcY, SVGr2, a)
+  const b1 = polarcart(SVGcX, SVGcY, SVGr1, b)
+  const b2 = polarcart(SVGcX, SVGcY, SVGr2, b)
+  const larc = b - a <= 180 ? "0" : "1" // large arc flag
+  ASSERT(!isNaN(b1.x) && !isNaN(b2.x) && !isNaN(a1.x) &&! isNaN(a2.x),
+    `arcPath(${a}, ${b})`)
   return [
-    "M", start.x, start.y, 
-    "A", radius, radius, 0, largeArcFlag, 0, end.x, end.y,
-    "L", end2.x, end2.y,
-    "A", endradius, endradius, 0, largeArcFlag, 1, start2.x, start2.y,
-    "Z",
+    "M", b1.x, b1.y,                      // move to angle b at the inner radius
+    "A", SVGr1,SVGr1, 0, larc, 0, a1.x,a1.y,  // arc to angle a at inner radius
+    "L", a2.x, a2.y,                          // line to angle a at outer radius
+    "A", SVGr2,SVGr2, 0, larc, 1, b2.x,b2.y,  // arc to angle b at outer radius
+    "Z",                                      // close the path, ending at b1
   ].join(' ')
 }
 
 // Execute the animation frame using css
-function spin_anim(spob) {
+function spinanimate(spob) {
   const t = Date.now()
-  if (t >= spob.tini + spob.tdel) { setTimeout(spinstop(spob), 0); return true }
-  spob.dcur = dist(t-spob.tini, spob.tdel, spob.dtot)
+  if (t >= spob.tini + spob.ttot) { setTimeout(spinstop(spob), 0); return true }
+  spob.dcur = dist(t-spob.tini, spob.ttot, spob.dtot)
   spob.domo.style.transform = `rotate(-${mod(spob.dcur, 360)}deg)`
-	requestAnimFrame(() => spin_anim(spob)) // curried version of spin_anim? why?
+	requestAnimFrame(() => spinanimate(spob)) // curry the spin object
 }
 
 // Snap to the final destination (which should be close enough to where the 
@@ -103,7 +113,7 @@ function spinstop(spob) {
   const p = win.weight
   let [a, b] = [(win.kyoom - p) * 360, win.kyoom * 360]  // start & end angles
   if (p > 1-1e-4) { a = 0; b = 360 - 1e-4 }
-  spob.domo.innerHTML += `<path d="${arcPath(50,50, 5, 50, a, b)}" ` +
+  spob.domo.innerHTML += `<path d="${arcPath(a, b)}" ` +
                            `fill="#00000000" stroke="white" stroke-width="2" />`
 }
 
@@ -118,7 +128,7 @@ function spingo(spob, windex) {
   let [a, b] = [(win.kyoom - p) * 360, win.kyoom * 360]    // start & end angles
   const rangle = Math.random() * (b - a) + a  // random angle pointing to winner
   spob.dtot = rangle + DROT*360   // a bunch of extra rotations; adjust to taste
-  spin_anim(spob)
+  spinanimate(spob)
 }
 
 // Take the weight (probability) of the pie slice and make the font blurb
@@ -139,10 +149,10 @@ function arcblurb(slot) {
   // also break (?) so we're just drawing basically the whole circle if a pie
   // slice is close enough to p=1.
   if (p > 1-1e-4) { a = 0; b = 360 - 1e-4 } // breaks a bit if that 1e-4 is 1e-5
-  return `<path d="${arcPath(50,50, 5,50, a, b)}" fill="${slot.color}" />`
+  return `<path d="${arcPath(a, b)}" fill="${slot.color}" />`
   // PS: we can just make a 0-359.9 degree arc so no need for this special case:
-  // `<circle cx="50" cy="50" r="50" fill="${color}"/>` +
-  // `<circle cx="50" cy="50" r="5"  fill="white"/>`
+  // `<circle cx="${SVGcX}" cy="${SVGcY}" r="${SVGr1}"  fill="white"/>` +
+  // `<circle cx="${SVGcX}" cy="${SVGcY}" r="${SVGr2}" fill="${color}"/>`
 }
 
 // Take angle in degrees and x,y coordinates, return svg blurb for the rotation
@@ -152,12 +162,12 @@ function rotateblurb(d, x, y) { return `transform="rotate(${d}, ${x}, ${y})"` }
 function spindraw(spob) {
   //const totweight = spob.slots.reduce((a, b) => a + b.weight, 0)
   //ASSERT(abs(totweight-1) < 1e-9, `Slot weights sum to ${totweight} not 1`)
-  const textOffset = spob.slots.length <= 4 ? 35 : 45
+  const textRadius = spob.slots.length <= 4 ? 35 : 45
   let svg = ''
   for (let i = 0; i < spob.slots.length; i++) {
     const p = spob.slots[i].weight                   // probability of this slot
     const a = (spob.slots[i].kyoom - p/2) * 360             // middle of the arc
-    const tc = polarToCartesian(50, 50, textOffset, a)      // text coords
+    const tc = polarcart(SVGcX, SVGcY, textRadius, a)       // text coords
     svg += arcblurb(spob.slots[i]) +
            `<text x="${tc.x}" y="${tc.y}" fill="white" ` + fontblurb(p) +
                   'alignment-baseline="central" text-anchor="middle" ' +
@@ -172,7 +182,7 @@ function spinit(div, slots) { return {
   slots:  slots,                    // list of slots (see genslots)
   windex: -1,                       // index of the winning slot
   tini:   -1,                       // initial timestamp, when spinning starts
-  tdel:   BOOP+SUSP,                // spin duration (ms); adjust to taste
+  ttot:   BOOP+SUSP,                // spin duration (ms); adjust to taste
   dtot:   -1,                       // total distance in degrees it's gonna spin
   dcur:   0,                        // current distance in degrees it has spun
 }}
