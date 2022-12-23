@@ -1,4 +1,4 @@
-/* Here we provide the following functions for spinning a spinner:
+/* Here we provide the following functions for visually spinning a spinner:
 1. genslots: generate the list of slots aka pie slices
 2. spinit: initialize spinner with a div and list of slots, return a spin object
 3. spingo: set the target and start spinning
