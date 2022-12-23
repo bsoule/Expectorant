@@ -1,3 +1,5 @@
+/* 
+*/
 // -----------------------------------------------------------------------------
 const INITPROB = .5 // the probability the spinner is preloaded with
 
@@ -40,8 +42,7 @@ spindraw(spob)
 // Update the slots and redraw the spinner on every keystroke in the input field
 $('expr').addEventListener('input', e => {
   const p = parsefrac(desugar(e.target.value))
-  // avoid rounding to exactly 0 or 1:
-  $('prob').innerHTML = conservaround(p, 1e-8, p<1e-8 ? +1 : p>1-1e-8 ? -1 : 0)
+  $('prob').innerHTML = tidyround(p, 1e-8)
   spob.slots = genslots(p)
   spindraw(spob)
 })
@@ -56,4 +57,3 @@ $('expr').addEventListener('keydown', e => {
 })
 
 })                                                         // end document-ready
-// -----------------------------------------------------------------------------
