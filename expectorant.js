@@ -22,7 +22,6 @@ an actual number.
 Finally-finally, we have a tidyround function for displaying the parsed
 probability in a non-gross way.
 */
-// -----------------------------------------------------------------------------
 
 const round = Math.round
 
@@ -99,25 +98,7 @@ function desugar(s) {
   return s
 }
 
-// -----------------------------------------------------------------------------
-// MASTER COPY CONFUSION WARNING: Everything below is copied from 
-// https://github.com/beeminder/conservaround
-// -----------------------------------------------------------------------------
-
-// Round x to the nearest r. We expect r to either be an integer, like rounding
-// to the nearest 10 or 1000, or a negative power of 10 like rounding to the 
-// nearest .01. Note that r is not a number of decimal places. E.g., if x is an 
-// amount of money then you'd want tidyround(x, .01) not tidyround(x, 2) which 
-// rounds to the nearest even number. This is similar to just doing round(x/r)*r
-// but it fixes floating point hideousness like if you try to round .34 to the
-// nearest tenth you get round(.34/.1)*.1 = 0.30000000000000004 instead of 0.3.
-// Limitation: We're only guaranteed to avoid such hideousness if r is an
-// integer or a negative power of 10.
-function tidyround(x, r=1) {
-  if (r < 0) return NaN   // this makes no sense and probably wants a loud error
-  if (r===0) return +x    // full machine precision!
-  const y = round(x/r)    // naively we'd just be returning round(x/r)*r but...
-  const marr = r.toExponential().match(/^1e-(\d+)$/) // match array for r ~1e-XX
-  if (!marr) return y*r          // do the naive round(x/r)*r thing if no match
-  return +`${y}e${-marr[1]}`     // put it back together and parse it as a float
-}
+// Round x to dp decimal places. 
+// You might think we could use toFixed() or toPrecision() here but they show a
+// bunch of ugly trailing zeros.
+function roundp(x, dp=0) { return round(x*10**dp)/10**dp }

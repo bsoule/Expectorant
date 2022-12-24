@@ -1,6 +1,9 @@
-/* 
+/* The Expectorant website
+
+This uses expectorant.js for the business logic and spinner.js for visually
+spinning the spinner.
 */
-// -----------------------------------------------------------------------------
+
 const INITPROB = .5 // the probability the spinner is preloaded with
 
 const CLOG = console.log
@@ -32,7 +35,7 @@ function expectorize(spob) {
   spingo(spob, windex)
 }
   
-document.addEventListener('DOMContentLoaded', () => {          // document-ready
+document.addEventListener('DOMContentLoaded', () => { // --------- document-ready
 
 $('expr').focus()
 $('prob').innerHTML = INITPROB
@@ -42,7 +45,7 @@ spindraw(spob)
 // Update the slots and redraw the spinner on every keystroke in the input field
 $('expr').addEventListener('input', e => {
   const p = parsefrac(desugar(e.target.value))
-  $('prob').innerHTML = tidyround(p, 1e-8)
+  $('prob').innerHTML = roundp(p, 8) 
   spob.slots = genslots(p)
   spindraw(spob)
 })
@@ -56,4 +59,4 @@ $('expr').addEventListener('keydown', e => {
   if (e.metaKey && e.key === "Enter") expectorize(spob)
 })
 
-})                                                         // end document-ready
+}) // -------------------------------------------------------- end document-ready
