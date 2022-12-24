@@ -2,14 +2,10 @@
 
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/codespaces/new?hide_repo_select=true&ref=master&repo=649443)
 
-## Hat tip
-
-NB: The ingenious restaurant bill splitting algorithm was devised by Dave 
-Pennock of, appropriately, oddhead.com.
-
 ## Changelog
 
 <pre>
+2022-12-23: Better rounding and other polishing
 2022-12-21: Polished up, better colors, better easing function for the spinner
 2022-12-04: A spinner!
 2022-10-23: Lets you enter a probability but doesn't do anything with it

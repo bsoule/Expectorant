@@ -1,4 +1,6 @@
-// No idea what this file is about; probably just kill it
+// I guess this was an early version of the thing we found on Codepen or 
+// JSfiddle that we started adapting to the YES-vs-NO spinner case.
+// Probably safe to throw this away at this point.
 
 window.requestAnimFrame = (function(){
   return window.requestAnimationFrame       ||

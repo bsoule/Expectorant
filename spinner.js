@@ -35,7 +35,6 @@ const sin = Math.sin
 const cos = Math.cos
 const TAU = 2*Math.PI
 const sqrt = Math.sqrt
-const pow = Math.pow // or use the ** operator
 
 // Shortcut to get the best animationFrame function
 window.requestAnimFrame = (function() {
@@ -57,8 +56,8 @@ function ease(t) {
   //return t**.2               // power easing function
   //return t*KBER/(1-t+KBER*(2*t-1)) // Bernoulli easing function  
   //return 2**(-10*t)*sin((t*10-0.75)*TAU/3)+1    // bouncy!
-  //return t<0.5 ? 8*t**4 : 1-pow(-2*t+2, 4)/2 // easeInOutQuart
-  //return t<0.5 ? 2*t**2 : 1-pow(-2*t+2, 2)/2 // easeInOutQuad
+  //return t<0.5 ? 8*t**4 : 1-Math.pow(-2*t+2, 4)/2 // easeInOutQuart
+  //return t<0.5 ? 2*t**2 : 1-Math.pow(-2*t+2, 2)/2 // easeInOutQuad
 }
 
 // Total degrees the spinner spins by time t if it does D by time T

@@ -23,9 +23,7 @@ Finally-finally, we have a tidyround function for displaying the parsed
 probability in a non-gross way.
 */
 
-const round = Math.round
-
-function percentify(x) { return round(100*x) + "%" }
+function percentify(x) { return Math.round(100*x) + "%" }
 
 // Renormalize a list of weights to sum to 1
 function renorm(w) {
@@ -98,7 +96,7 @@ function desugar(s) {
   return s
 }
 
-// Round x to dp decimal places. 
+// Round x to dp decimal places. So dp=0 means normal integer rounding.
 // You might think we could use toFixed() or toPrecision() here but they show a
 // bunch of ugly trailing zeros.
-function roundp(x, dp=0) { return round(x*10**dp)/10**dp }
+function roundp(x, dp=0) { return Math.round(x*10**dp)/10**dp }

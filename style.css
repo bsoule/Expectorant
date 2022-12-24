@@ -12,7 +12,7 @@ color: #da2c38
 #87c38f
 }
 
-/* 
+/* No idea what this was but apparently we don't need it? #SCHDEL
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
 */
@@ -41,6 +41,7 @@ h1 {
   color: hsl(17deg 13% 19%);
 }
 
+/* Put the version in itty-bitty gray font in the bottom corner of the page */
 .versiontag {
   color: hsla(17deg 13% 19% 20%);
   font-size: 9px;
