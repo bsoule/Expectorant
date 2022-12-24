@@ -47,7 +47,7 @@ if (ancient_browser_check()) {
 </script>
 
 <h1>Expectorant</h1>
-<div class='versiontag'>v2022.12.23d&nbsp;</div>
+<div class='versiontag'>v2022.12.24a&nbsp;</div>
 
 <p>
 <input id="expr" type="text" size="80"
@@ -95,13 +95,23 @@ So type in <b>7/20</b> and spin the spinner.
 If it comes up green then I lucked out and get the $20. 
 </p>
 
+<p>
+Or of course there's what the Soule-Reeveses call pumpkin-patching or skyootling where instead of paying someone the $X you owe them, you pay them 10 times that but with only 1/10 probability.
+That's handy for reducing transactional overhead: 90% of the time you don't have to make any money change hands or ledger anything.
+It especially saves time if the amount owed hasn't actually been computed yet. 
+As long as you <i>can</i> unambiguously compute if it the 10% expectorization happens then 90% of the time you don't have to bother.
+</p>
+
 <h2>Advanced feature for exact (expected) change</h2>
 
 <p>
-Entering something like <b>7@5,20</b> is a shortcut for <b>(7-5)/(20-5)</b>. 
-That's the probability p such that (1-p)*5 + p*20 = 7. 
-WTF? Here's TF: If you have a five and a twenty and owe me $7, then give me the twenty with that probability and the five otherwise. 
-Exquisitely fair (in expectation)!
+Suppose you owe me $7 but only have a five and a twenty.
+If you enter 
+<b>7@5,20</b>, 
+that's a shortcut for 
+<b>(7-5)/(20-5)</b>
+which is the probability p such that (1-p)*5 + p*20 = 7. 
+In other words, it's the exquisitely fair probability p that you should give me the twenty &mdash; giving me the five with probability 1-p &mdash; so that you're giving me exactly $7 in expectation!
 </p>
 
 <h2>Stochastic nerdtastic restaurant bill splitting</h2>
