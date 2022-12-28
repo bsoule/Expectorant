@@ -44,7 +44,7 @@ spindraw(spob)
   
 // Update the slots and redraw the spinner on every keystroke in the input field
 $('expr').addEventListener('input', e => {
-  const p = parsefrac(desugar(e.target.value))
+  const p = probabilify(e.target.value)
   $('prob').innerHTML = roundp(p, 8) 
   spob.slots = genslots(p)
   spindraw(spob)

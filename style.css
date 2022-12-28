@@ -55,7 +55,7 @@ input {
   padding: 8px;
   font-size: 16pt;
   width: 95%;
-  max-width: 390px; /* enough for the placeholder text */
+  max-width: 390px; /* 390px is just enough for the placeholder text */
 }
 
 /* Bee doesn't like this being gray like this:
@@ -78,16 +78,15 @@ input {
   cursor: pointer;
   outline-offset: 4px;
 }
-.front {
+.button-text {
   display: block;
   padding: 12px 42px;
   border-radius: 12px;
   font-size: 1.25rem;
   background: hsl(128deg 33% 65%);
-  /*color: white;*/
   transform: translateY(-6px);
 }
-.pushable:active .front {
+.pushable:active .button-text {
   transform: translateY(-2px);
 }
 

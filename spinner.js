@@ -1,6 +1,6 @@
 /* Visually spinning a spinner
 
-Here we provide the following functions for the website's javascript:
+Here we provide the following functions to the website's Javascript (main.js):
 
 1. genslots: generate the list of slots aka pie slices
 2. spinit: initialize spinner with a div and list of slots, return a spin object
@@ -36,13 +36,16 @@ const cos = Math.cos
 const TAU = 2*Math.PI
 const sqrt = Math.sqrt
 
-// Shortcut to get the best animationFrame function
+// Shortcut to get the best animationFrame function. Presumably we got this from
+// the internet somewhere as the standard thing to do circa 2022.
+/* don't think this is needed anymore...
 window.requestAnimFrame = (function() {
   return window.requestAnimationFrame       ||
          window.webkitRequestAnimationFrame ||
          window.mozRequestAnimationFrame    ||
          function(callback) { window.setTimeout(callback, 1000 / 60) }
 })()
+*/
 
 // Easing function ie normalized distance: d from 0 to 1 as t goes from 0 to 1.
 // See the bottom of this file for more on the math of this.
@@ -103,7 +106,7 @@ function spinanimate(spob) {
   if (t >= spob.tini + spob.ttot) { setTimeout(spinstop(spob), 0); return true }
   spob.dcur = dist(t-spob.tini, spob.ttot, spob.dtot)
   spob.domo.style.transform = `rotate(-${mod(spob.dcur, 360)}deg)`
-	requestAnimFrame(() => spinanimate(spob)) // curry the spin object
+	requestAnimationFrame(() => spinanimate(spob)) // curry the spin object
 }
 
 // Snap to the final destination (which should be close enough to where the 
@@ -212,7 +215,8 @@ function genslots(p) {
 
 // -----------------------------------------------------------------------------
 
-/* THE MATH
+/* THE MATH: making the spinner gradually come to a stop in natural-looking way
+
 None of this is specific to a spinning spinner, we just treat total degrees 
 traveled as a distance metric. Typically the spinner makes several full
 rotations so that just means the total distance traveled is more than a few
@@ -231,7 +235,7 @@ Now add two constraints:
 2. The velocity is zero at time T
 
 That's what we want for our spinner. We decide where we want it to land which
-implies a total distance it will travel (throw in a few extra full rotations
+implies a total distance it will travel (throwing in a few extra full rotations
 for suspensefulness) and we want it to come to rest when the beep-boop sound
 effect stops.
 
@@ -267,9 +271,10 @@ is imperceptible:
 dist(t) = D*(1 - k^(t/T))
 velo(t) = -D/T * log(k) * k^(t/T)
 
-where k>0 is a parameter giving the tolerance -- something like 0.01 -- for how
-close to D the distance function gets by time T. In other words, k is like the
-tolerance on what counts as stopped.
+where k>0 is a parameter giving the tolerance -- something like 0.01 but we can
+adjust it till it visually looks right -- for how close to D the distance
+function gets by time T. In other words, k is like the tolerance on what counts
+as stopped.
 
 PS: It's easier to do all of the above where T=1 and D=1 and then just rescale.
 So if we have a normalized distance function d(t) that hits distance 1 at time 1

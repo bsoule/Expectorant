@@ -29,6 +29,8 @@
 </head>
 <body>
 
+<div class='versiontag'>v2022.12.27c&nbsp;</div>
+
 <div class="content">
 
 <div id="ancient-browser-warning"></div><script>
@@ -46,20 +48,21 @@ if (ancient_browser_check()) {
 // -----------------------------------------------------------------------------
 </script>
 
+
 <h1>Expectorant</h1>
-<div class='versiontag'>v2022.12.24b&nbsp;</div>
 
 <p>
-<input id="expr" type="text" size="80"
-       placeholder="Expression that evaluates to a probability" />
-<span id="probpre">p=</span><span id="prob">0%</span>
+<div class="input-wrap">
+  <input id="expr" type="text" size="80"
+         placeholder="Expression that evaluates to a probability" />
+  <label><span id="probpre">p=</span><span id="prob">0%</span></label>
+</div>
 <br/>
 <center>
   <button id="expectorize" class="pushable">
-    <span class="front">Expectorize</span>
+    <span class="button-text">Expectorize</span>
   </button>
 </center>
-
 <audio id="audiotag1" preload="auto"
   src="https://expectorant.dreev.repl.co/assets/godmachine3.wav">
 </audio>
@@ -74,19 +77,15 @@ if (ancient_browser_check()) {
   </div>
 </div>
 
-<details>
+<details open>
 <summary style="cursor: pointer"><i>instructions</i></summary>
 
-<br>
-Expectorant is a stochastic, nerdtastic, restaurant bill splitting app and random number spinner.
-
-<h2>How do you use this?</h2>
-
 <p>
-<i>Enter a probability</i> (between 0 and 1) or an arithmetic expression that evaluates to a probability and press <i>Expectorize</i>.
+Expectorant is a stochastic nerdtastic restaurant bill splitting app and random number spinner.
+Just <i>enter a probability</i> (between 0 and 1) or an arithmetic expression that evaluates to a probability and press <i>Expectorize</i>.
 </p>
 
-<h2>Typical use case</h2>
+<h2>Basic use cases</h2>
 
 <p>
 Say you owe me $7 for lunch but only have a twenty.
@@ -96,13 +95,14 @@ If it comes up green then I lucked out and get the $20.
 </p>
 
 <p>
-Or of course there's what the Soule-Reeveses call pumpkin-patching or skyootling where instead of paying someone the $X you owe them, you pay them 10 times that but with only 1/10 probability.
+Or of course there's what the Soule-Reeveses call pumpkin-patching or skyootling where instead of paying someone the $X you owe them, you pay them 10X but with only 1/10 probability, and nothing otherwise.
 That's handy for reducing transactional overhead: 90% of the time you don't have to make any money change hands or ledger anything.
 It especially saves time if the amount owed hasn't actually been computed yet. 
-As long as you <i>can</i> unambiguously compute it if/when the 10% expectorization happens, 90% of the time you don't have to bother.
+As long as you <i>can</i> unambiguously compute it if/when the 10% expectorization happens, nine times out of ten you don't have to bother.
 </p>
 
-<h2>Advanced feature for exact (expected) change</h2>
+<h2>Exact (expected) change 
+&mdash; <code>@</code> syntax</h2>
 
 <p>
 Suppose you owe me $7 but only have a five and a twenty.
@@ -111,10 +111,11 @@ If you enter
 that's a shortcut for 
 <b>(7-5)/(20-5)</b>
 which is the probability p such that (1-p)*5 + p*20 = 7. 
-In other words, it's the exquisitely fair probability p that you should give me the twenty &mdash; giving me the five with probability 1-p &mdash; so that you're giving me exactly $7 in expectation!
+In other words, it's the exquisitely fair probability p that you should give me the twenty &mdash; otherwise giving me the five with probability 1-p &mdash; so that you're giving me exactly $7 in expectation!
 </p>
 
-<h2>Stochastic nerdtastic restaurant bill splitting</h2>
+<h2>Stochastic nerdtastic restaurant bill splitting
+&mdash; <code>:</code> syntax</h2>
 
 <p>
 Say the subtotal is $100 and the items on the bill are $5, $25, $60, and $10. 
@@ -126,14 +127,22 @@ If they're off the hook, amend again to <b>100:5,25,60</b>.
 This time most likely &mdash; p = 60/(100-5-25) &mdash; the $60 person will win the honor of paying the bill. 
 If not, notice that <b>100:5,25,60,10</b> yields 10/(100-5-25-60) = 1. 
 So if the process makes it to the last item on the bill then whoever got that item is it.
+</p>
+
+<p>
 Mathemagically, it doesn't matter what order you put the items in &mdash; each person "wins" (pays the whole bill) with probability equal to their own fair share of the bill.
 In other words, you pay in expectation exactly your fair share. 
-Including tax and tip, even though we never entered those.
-Pretty slick! 
+<i>Including tax and tip</i>, even though we never entered those.
+Pretty slick!
+</p>
+  
+<p>
 Speaking of tips, you can minimize the hassle by starting with the most expensive items.
 Then you don't have to figure out who most of the items belong to.
 Oh, and if 3 people split the $10 pickled monkey balls just treat it as 3 items, $10/3 each (expressions instead of numbers are allowed).
 </p>
+
+<h2>Credits</h2>
 
 <p>
 Built by Christopher Moravec, Bethany Soule, and Daniel Reeves.
