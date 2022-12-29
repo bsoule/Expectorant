@@ -35,9 +35,9 @@ function expectorize(spob) {
   spingo(spob, windex)
 }
   
-document.addEventListener('DOMContentLoaded', () => { // --------- document-ready
+document.addEventListener('DOMContentLoaded', () => { // -------- document-ready
 
-$('expr').focus()
+$('expr').focus() // this can be annoying when developing cuz it steals focus
 $('prob').innerHTML = INITPROB
 const spob = spinit(document.querySelector('#spinneroo'), genslots(INITPROB))
 spindraw(spob)
@@ -45,7 +45,7 @@ spindraw(spob)
 // Update the slots and redraw the spinner on every keystroke in the input field
 $('expr').addEventListener('input', e => {
   const p = probabilify(e.target.value)
-  $('prob').innerHTML = roundp(p, 8) 
+  $('prob').innerHTML = roundp(p, 17) // making this big for now for debugging 
   spob.slots = genslots(p)
   spindraw(spob)
 })
@@ -59,4 +59,4 @@ $('expr').addEventListener('keydown', e => {
   if (e.metaKey && e.key === "Enter") expectorize(spob)
 })
 
-}) // -------------------------------------------------------- end document-ready
+}) // ------------------------------------------------------- end document-ready

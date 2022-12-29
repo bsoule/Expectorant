@@ -23,52 +23,26 @@
 <meta name="twitter:card" content="summary" />
 
 <link rel="stylesheet" href="style.css" />
-<script src="main.js"></script>
-<script src="expectorant.js"></script>
-<script src="spinner.js"></script>
+<script src="main.js" defer></script>
+<script src="expectorant.js" defer></script>
+<script src="spinner.js" defer></script>
 </head>
 <body>
 
-<div class='versiontag'>v2022.12.27c&nbsp;</div>
-
+<div class='versiontag'>v2022.12.28e&nbsp;</div>
 <div class="content">
-
-<div id="ancient-browser-warning"></div><script>
-// -----------------------------------------------------------------------------
-function ancient_browser_check() {
-  "use strict"                         // does this matter?
-  try { eval("let foo = (x)=>x+1") }   // feature detection: "let" & arrow funcs
-  catch (e) { return true }            // bad browser, not understanding ES6
-  return false                         // good browser, not being ancient
-}
-if (ancient_browser_check()) {
-  document.getElementById('ancient-browser-warning').innerHTML = 
-    "<h1>Ancient browser warning: nothing's gonna work here!</h1>"
-}
-// -----------------------------------------------------------------------------
-</script>
-
-
 <h1>Expectorant</h1>
 
-<p>
-<div class="input-wrap">
-  <input id="expr" type="text" size="80"
-         placeholder="Expression that evaluates to a probability" />
-  <label><span id="probpre">p=</span><span id="prob">0%</span></label>
-</div>
-<br/>
-<center>
-  <button id="expectorize" class="pushable">
-    <span class="button-text">Expectorize</span>
-  </button>
-</center>
+<input id="expr" type="text" size="80"
+       placeholder="Expression that evaluates to a probability" />
+<label><span id="probpre">p=</span><span id="prob">0%</span></label>
+<br>
+<button id="expectorize">
+  <span class="button-text">Expectorize</span>
+</button>
 <audio id="audiotag1" preload="auto"
   src="https://expectorant.dreev.repl.co/assets/godmachine3.wav">
 </audio>
-</p>
-
-</div> <!-- end content -->
 
 <div class="spin_container"> <!-- initially contains placeholder for spinner -->
   <div id="spinneroo" class="spin_wrapper">
@@ -76,8 +50,9 @@ if (ancient_browser_check()) {
          class="spin" width="100%" height="100%" viewbox="0 0 100 100"></svg>
   </div>
 </div>
-
-<details open>
+  
+<div class="texty">
+<details open id="instructions">
 <summary style="cursor: pointer"><i>instructions</i></summary>
 
 <p>
@@ -103,7 +78,7 @@ As long as you <i>can</i> unambiguously compute it if/when the 10% expectorizati
 
 <h2>Exact (expected) change 
 &mdash; <code>@</code> syntax</h2>
-
+  
 <p>
 Suppose you owe me $7 but only have a five and a twenty.
 If you enter 
@@ -113,10 +88,10 @@ that's a shortcut for
 which is the probability p such that (1-p)*5 + p*20 = 7. 
 In other words, it's the exquisitely fair probability p that you should give me the twenty &mdash; otherwise giving me the five with probability 1-p &mdash; so that you're giving me exactly $7 in expectation!
 </p>
-
+  
 <h2>Stochastic nerdtastic restaurant bill splitting
 &mdash; <code>:</code> syntax</h2>
-
+  
 <p>
 Say the subtotal is $100 and the items on the bill are $5, $25, $60, and $10. 
 Enter <b>100:5</b> and have the person who ordered the $5 item spin the spinner.
@@ -128,22 +103,22 @@ This time most likely &mdash; p = 60/(100-5-25) &mdash; the $60 person will win 
 If not, notice that <b>100:5,25,60,10</b> yields 10/(100-5-25-60) = 1. 
 So if the process makes it to the last item on the bill then whoever got that item is it.
 </p>
-
+  
 <p>
 Mathemagically, it doesn't matter what order you put the items in &mdash; each person "wins" (pays the whole bill) with probability equal to their own fair share of the bill.
 In other words, you pay in expectation exactly your fair share. 
 <i>Including tax and tip</i>, even though we never entered those.
 Pretty slick!
 </p>
-  
+    
 <p>
 Speaking of tips, you can minimize the hassle by starting with the most expensive items.
 Then you don't have to figure out who most of the items belong to.
 Oh, and if 3 people split the $10 pickled monkey balls just treat it as 3 items, $10/3 each (expressions instead of numbers are allowed).
 </p>
-
+  
 <h2>Credits</h2>
-
+  
 <p>
 Built by Christopher Moravec, Bethany Soule, and Daniel Reeves.
 Based on an Android app that Soule and Reeves published in 2010 (!) and that's 
@@ -152,9 +127,35 @@ Thanks to Dave Pennock who invented the restaurant bill-splitting algorithm.
 See 
 <a href="http://messymatters.com/expectorant" title="Stochastic, Nerdtastic Restaurant Bill Splitting on Danny and Sharad's old Messy Matters blog">the original blog post</a>
 for more.
-</p>
-
+</p>  
 </details>
+
+</div> <!-- end texty -->
+</div> <!-- end content -->
+
+<script>
+// -----------------------------------------------------------------------------
+// Stick this Javascript at the end of your html and it will stick a warning at
+// the top of the page if it's loaded on an ancient browser that doesn't support
+// modern Javascript.
+function ancient_browser_check() {
+  "use strict"                         // does this matter?
+  try { eval("let foo = (x)=>x+1") }   // feature detection: "let" & arrow funcs
+  catch (e) { return true }            // bad browser, not understanding ES6
+  return false                         // good browser, not being ancient
+}
+if (ancient_browser_check()) {
+  //document.body.insertAdjacentHTML('afterbegin',
+  //  "<h1>Ancient browser warning: nothing's gonna work here!</h1>")
+  // The following version miiiight be safer for ancient browsers, which we're 
+  // counting on this function to work on obviously.
+  var body = document.body;
+  var x = document.createElement("h1");
+  x.innerHTML = "Ancient browser warning: nothing's gonna work here!";
+  body.insertBefore(x, body.firstChild);
+}
+// -----------------------------------------------------------------------------
+</script>
 
 </body>
 </html>

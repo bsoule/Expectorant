@@ -1,33 +1,14 @@
 @import url('https://fonts.cdnfonts.com/css/hk-groteks');
 
-:root {
-  --color-bg: #f4f0bb;
-}
+:root { --color-bg: #f4f0bb; }
 
+/* Apparently this isn't used anywhere? Bethany? #SCHDEL
 .thing {
 color: #da2c38
 #43291f
 #f4f0bb
 #226f54
 #87c38f
-}
-
-/* No idea what this was but apparently we don't need it? #SCHDEL
-* { box-sizing: border-box; }
-[hidden] { display: none !important; }
-*/
-
-/* Shouldn't need this now that we're doing the @import above. #SCHDEL
-@font-face {
-  font-family: HK Grotesk;
-  src: url("https://cdn.glitch.me/605e2a51-d45f-4d87-a285-9410ad350515%2FHKGrotesk-Regular.otf?v=1603136326027")
-       format("opentype");
-}
-@font-face {
-  font-family: HK Grotesk;
-  font-weight: bold;
-  src: url("https://cdn.glitch.me/605e2a51-d45f-4d87-a285-9410ad350515%2FHKGrotesk-Bold.otf?v=1603136323437")
-       format("opentype");
 }
 */
 
@@ -37,8 +18,11 @@ body {
   background-color: var(--color-bg);
 }
 
-h1 {
-  color: hsl(17deg 13% 19%);
+h1 { color: hsl(17deg 13% 19%); }
+
+p {
+  font-size: 18px;
+  max-width: 800px;
 }
 
 /* Put the version in itty-bitty gray font in the bottom corner of the page */
@@ -48,14 +32,6 @@ h1 {
   position: fixed;
   bottom: 0;
   right: 0;
-}
-
-input { 
-  height: 24px;
-  padding: 8px;
-  font-size: 16pt;
-  width: 95%;
-  max-width: 390px; /* 390px is just enough for the placeholder text */
 }
 
 /* Bee doesn't like this being gray like this:
@@ -70,7 +46,7 @@ input {
   justify-content: center;
 }
 
-.pushable {
+button {
   background: hsl(159deg 53% 28%);
   border-radius: 12px;
   border: none;
@@ -86,7 +62,7 @@ input {
   background: hsl(128deg 33% 65%);
   transform: translateY(-6px);
 }
-.pushable:active .button-text {
+button:active .button-text {
   transform: translateY(-2px);
 }
 
@@ -94,14 +70,14 @@ input {
 	width: 100%;
 	height: 100%;
 	position: relative;
+  margin-top: 35px;
+  margin-bottom: 25px;
 }
-
 .spin_wrapper, :before, :after {
   box-sizing:border-box;
   margin:0;
   padding:0;
 } 
-
 .spin_wrapper {
 	max-width: 250px;
   max-height: 250px;
@@ -132,4 +108,12 @@ input {
 
 .spin {
 	transform-origin: 50% 50%;
+}
+
+input { 
+  height: 24px;
+  padding: 8px;
+  font-size: 16pt;
+  width:95%;
+  max-width: 390px; /* 390px is just enough for the placeholder text */
 }
