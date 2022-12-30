@@ -33,7 +33,7 @@
 </head>
 <body>
 
-<div class='versiontag'>v2022.12.30a&nbsp;</div>
+<div class='versiontag'>v2022.12.30b&nbsp;</div>
 <div class="content">
 <h1>Expectorant</h1>
 
@@ -60,7 +60,7 @@
 <summary style="cursor: pointer"><i>instructions</i></summary>
 
 <p>
-Expectorant is a stochastic nerdtastic restaurant bill splitting app and random number spinner.
+Expectorant is a stochastic, nerdtastic restaurant bill splitting app and random number spinner.
 Just <i>enter a probability</i> (between 0 and 1) or an arithmetic expression that evaluates to a probability and press <i>Expectorize</i>.
 </p>
 
@@ -68,9 +68,9 @@ Just <i>enter a probability</i> (between 0 and 1) or an arithmetic expression th
 
 <p>
 Say you owe me $7 for lunch but only have a twenty.
-If you give me the twenty with probability 7/20 then in expectation you've paid me $7!
+If you give me the twenty with probability 7/20 (35%) then in expectation you've paid me $7!
 So type in <code>7/20</code> and spin the spinner.
-If it comes up green then I lucked out and get the $20. 
+If it comes up green then I lucked out and get the $20.
 </p>
 
 <p>
@@ -84,14 +84,20 @@ As long as you <i>can</i> unambiguously compute it if/when the 10% expectorizati
 &mdash; <code>@</code> syntax</h2>
   
 <p>
-Suppose you owe me $7 but only have a five and a twenty.
-If you enter 
-<code>7@5,20</code>, 
-that's a shortcut for 
-\((7-5)/(20-5)\)
+Suppose you owe me an especially awkward amount like $8.27 and you have a five and a twenty.
+Paying me $5 is <i>kind of</i> close so if you probably give the five and maybe give me the twenty then that could be fair.
+Can we make it exactly fair?
+Yes we can!
+If you enter the amount you owe, an @-sign, followed by two amounts
+&mdash; the first lower than you owe and the second greater &mdash;
+then Expectorant will turn that “probably” and “maybe” into exact probabilities.
+In this example you'd type
+<code>8.27@5,20</code>.
+That gets turned into 
+$$\frac{8.27-5}{20-5} \approx 22\%$$
 which is the probability \(p\) such that 
-\((1-p)\cdot 5 + p\cdot 20 = 7\). 
-In words, it's the exquisitely fair probability \(p\) vs \(1-p\) that you should give me the twenty vs the five so that you're giving me exactly $7 in expectation!
+\((1-p)\cdot 5 + p\cdot 20 = 8.27\).
+That's the exquisitely fair probability \(p\) vs \(1-p\) that you should give me the twenty vs the five so that you're giving me exactly $8.27 in expectation!
 </p>
   
 <h2>Stochastic nerdtastic restaurant bill splitting
@@ -126,7 +132,7 @@ Then you don't have to figure out who most of the items belong to.
 </p>
 <p>
 What if three people split the $16 
-<span id="vittle">kraken quesadilla</span>?
+<span id="vittle">nondescript nachos with broken javascript</span>?
 Just treat it as 3 items, $16/3 each.
 And you can literally type them as <code>16/3</code> since 
 Expectorant speaks arithmetic.
