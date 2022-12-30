@@ -7,6 +7,7 @@ spinning the spinner.
 const INITPROB = .5 // the probability the spinner is preloaded with
 
 const VITTLES = [
+  "easter egg salad",
   "5-spice fudge fajitas",
   "celeriac sundae",
   "celery sundae",
