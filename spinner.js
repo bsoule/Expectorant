@@ -197,20 +197,14 @@ function spinit(div, slots) { return {
 // For the case of 2 slots in Expectorant, the first slot is for
 // yes/pay/high/green and the second is for no/free/low/red.
 function genslots(p) {
-  if (Array.isArray(p)) { 
-    ASSERT(false, "More than 2 slots not supported yet")
-    return null
-  }
-  if (!(p >= 0 && p <= 1)) {
-    return [
-      { value: "🍌", weight: 1, kyoom: 1, color: 'black' }, // Obviously we'll
+  ASSERT(!Array.isArray(p), "More than 2 slots not supported yet")
+  return isNaN(p) || p < 0 || p > 1 ?
+    [ { value: "🍌", weight: 1, kyoom: 1, color: 'black' }, // Obviously we'll
       { value: "🍒", weight: 0, kyoom: 1, color: 'taupe' }, // never see the 🍒
-    ]
-  }
-  return [
-    { value: percentify(p),   weight: p,   kyoom: p, color: YAYCOLOR },
-    { value: percentify(1-p), weight: 1-p, kyoom: 1, color: NAYCOLOR },
-  ]  
+    ] :
+    [ { value: percentify(p),   weight: p,   kyoom: p, color: YAYCOLOR },
+      { value: percentify(1-p), weight: 1-p, kyoom: 1, color: NAYCOLOR },
+    ]  
 }
 
 // -----------------------------------------------------------------------------

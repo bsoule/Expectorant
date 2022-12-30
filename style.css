@@ -20,9 +20,21 @@ body {
 
 h1 { color: hsl(17deg 13% 19%); }
 
+/* These seem like standardish recommendations for prose on web pages? */
 p {
   font-size: 18px;
-  max-width: 800px;
+  max-width: 600px;
+  line-height: 145%; /* the max that practicaltypography.com recommends */
+}
+
+/* Fancy distinctive display of examples of text the user can type in the 
+Expectorant input field */
+code {
+  padding: 2px 4px;
+  color: #d14;
+  white-space: nowrap;
+  background-color: #f7f7f9;
+  border: 1px solid #e1e1e8;
 }
 
 /* Put the version in itty-bitty gray font in the bottom corner of the page */
@@ -34,7 +46,12 @@ p {
   right: 0;
 }
 
-/* Bee doesn't like this being gray like this:
+/* Bee doesn't like this being gray like this. Dreev kinda does. The idea was to
+deemphasize it, like it's just there as a sanity check but mostly you care about
+your representation of the probability that you typed (like your "1/4", not the
+"0.25") and the spinner. That was also the rationale for having it off to the 
+side, when it fits there. */
+/*
 #prob    { color: #999999; }
 #probpre { color: #999999; }
 */

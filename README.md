@@ -5,6 +5,7 @@
 ## Changelog
 
 <pre>
+2022-12-29: Lots of fussing and tweaking
 2022-12-23: Better rounding and other polishing
 2022-12-21: Polished up, better colors, better easing function for the spinner
 2022-12-04: A spinner!
@@ -15,5 +16,4 @@
 2010-05-10: Android app released on whatever Google Play was called back then
 </pre>
 
-New name idea: Bernoullinator? Cuz it does Bernoulli trials? Then instead of 
-expectorize it'd be bernoullinate.
+New name idea: Bernoullinator? Cuz it does Bernoulli trials? Then instead of "expectorize" it'd be "bernoullinate". But it seems "Expectorant" was pretty sticky, so to speak. :)

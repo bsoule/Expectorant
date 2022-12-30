@@ -22,6 +22,10 @@
   content="https://expectorant.dreev.repl.co/assets/slot-machine-32.ico" />
 <meta name="twitter:card" content="summary" />
 
+<script type="text/javascript" id="MathJax-script" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+</script>
+
 <link rel="stylesheet" href="style.css" />
 <script src="main.js" defer></script>
 <script src="expectorant.js" defer></script>
@@ -29,13 +33,13 @@
 </head>
 <body>
 
-<div class='versiontag'>v2022.12.28e&nbsp;</div>
+<div class='versiontag'>v2022.12.29c&nbsp;</div>
 <div class="content">
 <h1>Expectorant</h1>
 
 <input id="expr" type="text" size="80"
        placeholder="Expression that evaluates to a probability" />
-<label><span id="probpre">p=</span><span id="prob">0%</span></label>
+<label id="prob-label"><span id="probpre">p=</span><span id="prob">0%</span></label>
 <br>
 <button id="expectorize">
   <span class="button-text">Expectorize</span>
@@ -65,7 +69,7 @@ Just <i>enter a probability</i> (between 0 and 1) or an arithmetic expression th
 <p>
 Say you owe me $7 for lunch but only have a twenty.
 If you give me the twenty with probability 7/20 then in expectation you've paid me $7!
-So type in <b>7/20</b> and spin the spinner.
+So type in <code>7/20</code> and spin the spinner.
 If it comes up green then I lucked out and get the $20. 
 </p>
 
@@ -82,25 +86,30 @@ As long as you <i>can</i> unambiguously compute it if/when the 10% expectorizati
 <p>
 Suppose you owe me $7 but only have a five and a twenty.
 If you enter 
-<b>7@5,20</b>, 
+<code>7@5,20</code>, 
 that's a shortcut for 
-<b>(7-5)/(20-5)</b>
-which is the probability p such that (1-p)*5 + p*20 = 7. 
-In other words, it's the exquisitely fair probability p that you should give me the twenty &mdash; otherwise giving me the five with probability 1-p &mdash; so that you're giving me exactly $7 in expectation!
+\((7-5)/(20-5)\)
+which is the probability \(p\) such that 
+\((1-p)\cdot 5 + p\cdot 20 = 7\). 
+In words, it's the exquisitely fair probability \(p\) vs \(1-p\) that you should give me the twenty vs the five so that you're giving me exactly $7 in expectation!
 </p>
   
 <h2>Stochastic nerdtastic restaurant bill splitting
 &mdash; <code>:</code> syntax</h2>
   
 <p>
-Say the subtotal is $100 and the items on the bill are $5, $25, $60, and $10. 
-Enter <b>100:5</b> and have the person who ordered the $5 item spin the spinner.
+Say the subtotal for your restaurant bill is $100 and the items on the bill are $5, $25, $60, and $10. 
+Enter <code>100:5</code> and have the person who ordered the $5 item spin the spinner.
 If it comes up green (a 5% chance) they get to pay the whole bill! 
-If not, amend the expression as <b>100:5,25</b> and repeat for the person who got the $25 item. 
-They'll "win" with probability 25/(100-5). 
-If they're off the hook, amend again to <b>100:5,25,60</b>. 
-This time most likely &mdash; p = 60/(100-5-25) &mdash; the $60 person will win the honor of paying the bill. 
-If not, notice that <b>100:5,25,60,10</b> yields 10/(100-5-25-60) = 1. 
+If not, amend the expression as <code>100:5,25</code> and repeat for the person who got the $25 item. 
+They'll "win" with probability \(\frac{25}{100-5}\). 
+If they're off the hook, amend again to <code>100:5,25,60</code>. 
+This time most likely, 
+\(p = \frac{60}{100-5-25} \approx 86\%\),
+the $60 person will win the honor of paying the bill. 
+If not, notice that 
+<code>100:5,25,60,10</code> yields 
+\(\frac{10}{100-5-25-60} = 1\). 
 So if the process makes it to the last item on the bill then whoever got that item is it.
 </p>
   
@@ -114,7 +123,12 @@ Pretty slick!
 <p>
 Speaking of tips, you can minimize the hassle by starting with the most expensive items.
 Then you don't have to figure out who most of the items belong to.
-Oh, and if 3 people split the $10 pickled monkey balls just treat it as 3 items, $10/3 each (expressions instead of numbers are allowed).
+</p>
+<p>
+What if three people split the $16 kraken quesadilla?
+Just treat it as 3 items, $16/3 each.
+And you can literally type them as <code>16/3</code> since 
+Expectorant speaks arithmetic.
 </p>
   
 <h2>Credits</h2>
@@ -139,16 +153,15 @@ for more.
 // the top of the page if it's loaded on an ancient browser that doesn't support
 // modern Javascript.
 function ancient_browser_check() {
-  "use strict"                         // does this matter?
+  "use strict"                         // does using "use strict" matter?
   try { eval("let foo = (x)=>x+1") }   // feature detection: "let" & arrow funcs
   catch (e) { return true }            // bad browser, not understanding ES6
   return false                         // good browser, not being ancient
 }
 if (ancient_browser_check()) {
-  //document.body.insertAdjacentHTML('afterbegin',
+  //document.body.insertAdjacentHTML('afterbegin', '<h1>' + s + '</h1>')
   //  "<h1>Ancient browser warning: nothing's gonna work here!</h1>")
-  // The following version miiiight be safer for ancient browsers, which we're 
-  // counting on this function to work on obviously.
+  // That works but the following version miiight be safer for ancient browsers:
   var body = document.body;
   var x = document.createElement("h1");
   x.innerHTML = "Ancient browser warning: nothing's gonna work here!";
