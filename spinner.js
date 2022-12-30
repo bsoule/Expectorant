@@ -111,7 +111,8 @@ function spinanimate(spob) {
 
 // Snap to the final destination (which should be close enough to where the 
 // animation is that there's no visible snapping) and draw a bolder outline 
-// around the winning pie slice.
+// around the winning pie slice. Stuff that shouldn't happen until the spinner
+// stops goes here.
 function spinstop(spob) {
   spob.domo.style.transform = `rotate(-${mod(spob.dtot, 360)}deg)`
   const win = spob.slots[spob.windex]
@@ -124,10 +125,11 @@ function spinstop(spob) {
   // blurb in the html here, when the spinner stops.
   const answerblurb = ['YES / PAY / HIGH', 'NO / FREE / LOW'][spob.windex]
   $('theanswer').innerHTML = `${answerblurb} won w/ p=${roundp(p, 3)}`
+  // also should make the text color of the blurb red or green
 }
 
 // Set the winner and start spinning the given spinner object
-async function spingo(spob, windex) {
+function spingo(spob, windex) {
   ASSERT(windex >= 0 && windex < spob.slots.length, 
     `Can't take slot ${windex} of ${JSON.stringify(spob.slots)}`)
   spob.windex = windex
