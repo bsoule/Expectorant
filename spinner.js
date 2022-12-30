@@ -120,10 +120,14 @@ function spinstop(spob) {
   if (p > 1-1e-4) { a = 0; b = 360 - 1e-4 }
   spob.domo.innerHTML += `<path d="${arcPath(a, b)}" ` +
                            `fill="#00000000" stroke="white" stroke-width="2" />`
+  // These blurbs should probably live in genslots()? But need to set the answer
+  // blurb in the html here, when the spinner stops.
+  const answerblurb = ['YES / PAY / HIGH', 'NO / FREE / LOW'][spob.windex]
+  $('theanswer').innerHTML = `${answerblurb} won w/ p=${roundp(p, 3)}`
 }
 
 // Set the winner and start spinning the given spinner object
-function spingo(spob, windex) {
+async function spingo(spob, windex) {
   ASSERT(windex >= 0 && windex < spob.slots.length, 
     `Can't take slot ${windex} of ${JSON.stringify(spob.slots)}`)
   spob.windex = windex

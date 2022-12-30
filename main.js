@@ -56,6 +56,7 @@ let trials = 0      // probability.
 
 // Take a probability and a spin object, pick the winner and spin that puppy
 function expectorize(spob) {
+  $('theanswer').innerHTML = '&nbsp;'
   $('vittle').innerHTML = VITTLES[++vindex % VITTLES.length]
   $('audiotag1').play()
   spindraw(spob)
