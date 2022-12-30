@@ -56,7 +56,12 @@ function spinHelper(p, w) {
 
 // Randomly return an element of the list l, weighted by w.
 // Eg, spinpick(["a","b","c"], [1,2,1]) returns "a" w/ p=.25, "b" w/ p=.5 etc.
-function spinpick(l, w) { return l[spinHelper(Math.random(), w)] }
+function spinpick(l, w=null) { 
+  if (w===null) {
+    w = Array(l.length).fill(1)
+  }
+  return l[spinHelper(Math.random(), w)] 
+}
 
 /* Testing spinpick -- seems rock solid for lots of sample probabilities
 sum = 0;

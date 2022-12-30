@@ -6,6 +6,25 @@ spinning the spinner.
 
 const INITPROB = .5 // the probability the spinner is preloaded with
 
+const VITTLES = [
+  "5-spice fudge fajitas",
+  "celeriac sundae",
+  "celery sundae",
+  "nightshade nutmeg nachos",
+  "marshmallow mustard m&m muffins",
+  "marshmallow mustard muffins",
+  "apple vanilla nachos",
+  "chelation cheeze",
+  "garlic fudge nachos",
+  "kraken quesadillas",
+  "wasabi waffles",
+  "banana and mustard sliders",
+  "apple and liver pâté panini",
+  "blueberry and beef jerky parfait",
+  "tofu teriyaki tater tots",
+  "crusty creamy croissant crumpet crumble",
+]
+
 const CLOG = console.log
 const ASSERT = console.assert
 function $(id) { return document.getElementById(id) } // to be jQuery-esque
@@ -39,6 +58,7 @@ document.addEventListener('DOMContentLoaded', () => { // -------- document-ready
 
 $('expr').focus() // this can be annoying when developing cuz it steals focus
 $('prob').innerHTML = INITPROB
+$('vittle').innerHTML = spinpick(VITTLES)
 const spob = spinit(document.querySelector('#spinneroo'), genslots(INITPROB))
 spindraw(spob)
   
