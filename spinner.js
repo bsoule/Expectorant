@@ -116,16 +116,16 @@ function spinanimate(spob) {
 function spinstop(spob) {
   spob.domo.style.transform = `rotate(-${mod(spob.dtot, 360)}deg)`
   const win = spob.slots[spob.windex]
-  const p = win.weight
+  const p = win.prob
   let [a, b] = [(win.kyoom - p) * 360, win.kyoom * 360]  // start & end angles
   if (p > 1-1e-4) { a = 0; b = 360 - 1e-4 }
   spob.domo.innerHTML += `<path d="${arcPath(a, b)}" ` +
                            `fill="#00000000" stroke="white" stroke-width="2" />`
-  // These blurbs should probably live in genslots()? But need to set the answer
-  // blurb in the html here, when the spinner stops.
-  const answerblurb = ['YES / PAY / HIGH', 'NO / FREE / LOW'][spob.windex]
-  $('theanswer').innerHTML = `${answerblurb} won w/ p=${roundp(p, 3)}`
+  $('theanswer').innerHTML = p < .01 ?
+    `<b>whoa, ${win.desc} won w/ p<.01</b>` :
+    `<b>${win.desc} won w/ p=${roundp(p, 3)}</b>`
   // also should make the text color of the blurb red or green
+  $('theanswer').style.color = win.color
 }
 
 // Set the winner and start spinning the given spinner object
@@ -135,14 +135,14 @@ function spingo(spob, windex) {
   spob.windex = windex
   spob.tini = Date.now()
   const win = spob.slots[windex]
-  const p = win.weight
+  const p = win.prob
   let [a, b] = [(win.kyoom - p) * 360, win.kyoom * 360]    // start & end angles
   const rangle = Math.random() * (b - a) + a  // random angle pointing to winner
   spob.dtot = rangle + DROT*360   // a bunch of extra rotations; adjust to taste
   spinanimate(spob)
 }
 
-// Take the weight (probability) of the pie slice and make the font blurb
+// Take the probability of the pie slice and make the font blurb
 function fontblurb(x) {
   const MAXF = 16            // biggest font size that looks good on the spinner
   const fs = min(MAXF, max(0, x*100 - 1))  // eg, p=10% displayed at font size 9
@@ -152,7 +152,7 @@ function fontblurb(x) {
 // Take a slot object and generate the svg blurb
 function arcblurb(slot) {
   //CLOG(`DEBUG: arcblurb slot=${JSON.stringify(slot)}`)
-  const p = slot.weight                        // probability ie fraction of pie
+  const p = slot.prob                        // probability ie fraction of pie
   let [a, b] = [(slot.kyoom - p) * 360, slot.kyoom * 360]  // start & end angles
   // Things break if we try to draw an arc from exactly 0 to 360 degrees, those
   // being the same thing, so adjust to like 0 to 359.999 in that case.
@@ -171,18 +171,18 @@ function rotateblurb(d, x, y) { return `transform="rotate(${d}, ${x}, ${y})"` }
 
 // Draw or redraw the given spin object
 function spindraw(spob) {
-  //const totweight = spob.slots.reduce((a, b) => a + b.weight, 0)
+  //const totweight = spob.slots.reduce((a, b) => a + b.prob, 0)
   //ASSERT(abs(totweight-1) < 1e-9, `Slot weights sum to ${totweight} not 1`)
   const textRadius = spob.slots.length <= 4 ? 35 : 45
   let svg = ''
   for (let i = 0; i < spob.slots.length; i++) {
-    const p = spob.slots[i].weight                   // probability of this slot
+    const p = spob.slots[i].prob                   // probability of this slot
     const a = (spob.slots[i].kyoom - p/2) * 360             // middle of the arc
     const tc = polarcart(SVGcX, SVGcY, textRadius, a)       // text coords
     svg += arcblurb(spob.slots[i]) +
            `<text x="${tc.x}" y="${tc.y}" fill="white" ` + fontblurb(p) +
                   'alignment-baseline="central" text-anchor="middle" ' +
-                  `${rotateblurb(a, tc.x, tc.y)}>${spob.slots[i].value}</text>`
+                  `${rotateblurb(a, tc.x, tc.y)}>${spob.slots[i].label}</text>`
   }
   spob.domo.innerHTML = svg
 }
@@ -204,13 +204,20 @@ function spinit(div, slots) { return {
 // yes/pay/high/green and the second is for no/free/low/red.
 function genslots(p) {
   ASSERT(!Array.isArray(p), "More than 2 slots not supported yet")
-  return isNaN(p) || p < 0 || p > 1 ?
-    [ { value: "🍌", weight: 1, kyoom: 1, color: 'black' }, // Obviously we'll
-      { value: "🍒", weight: 0, kyoom: 1, color: 'taupe' }, // never see the 🍒
-    ] :
-    [ { value: percentify(p),   weight: p,   kyoom: p, color: YAYCOLOR },
-      { value: percentify(1-p), weight: 1-p, kyoom: 1, color: NAYCOLOR },
-    ]  
+  if (isNaN(p) || p < 0 || p > 1) {
+    const d1 = "bananas"
+    const d2 = "this can be anything cuz there's a 0% chance of seeing it"
+    return [ 
+      { label: "🍌", prob: 1, kyoom: 1, color: 'black', desc: d1 },
+      { label: "🍒", prob: 0, kyoom: 1, color: 'taupe', desc: d2 }, ]
+  } else {
+    const d1 = "YES / PAY / HIGH"
+    const d2 = "NO / FREE / LOW"
+    return [ 
+      { label: percentify(p),   prob: p,   kyoom: p, color: YAYCOLOR, desc: d1},
+      { label: percentify(1-p), prob: 1-p, kyoom: 1, color: NAYCOLOR, desc: d2},
+    ]
+  }
 }
 
 // -----------------------------------------------------------------------------

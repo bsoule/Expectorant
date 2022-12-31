@@ -60,7 +60,7 @@ function expectorize(spob) {
   $('vittle').innerHTML = VITTLES[++vindex % VITTLES.length]
   $('audiotag1').play()
   spindraw(spob)
-  const p = spob.slots[0].weight // probability for first slot ie YES
+  const p = spob.slots[0].prob // probability for first slot ie YES
   //CLOG("WARNING: Flipped the probs from [p,1-p] to [1-p,p] for testing!")
   const windex = spinpick([0, 1], [p, 1-p]) // land on slot 0 with probability p
   if (p === lastp) {
