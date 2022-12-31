@@ -41,6 +41,16 @@ const VITTLES = [...shuffle([
   "lime peel and watermelon seed stir fry", // christopher
   "deep-fried green tea 'n' coca-cola gummies", // ryan
   "deep-fried beet-flavored twinkies", // ryan
+  // the following aren't in Faire's poll yet
+  // https://forms.gle/QrRRuRm2PqH3U4KY6
+  "jellyfish jelly doughnuts", // GPT
+  "pickle and potato chip milkshake", // GPT
+  "honey mustard ice cream sundae", // GPT
+  "chocolate-covered chicken nuggets", // GPT
+  "bacon-wrapped pickle and cream cheese bites", // GPT
+  "sardine and marshmallow kabobs", // GPT
+  "peanut butter and jelly milkshake", // GPT
+
 ]), "easter egg salad"]
 
 let vindex = 0 // which vittle to use as an example in the instructions

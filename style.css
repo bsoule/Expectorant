@@ -46,16 +46,6 @@ code {
   right: 0;
 }
 
-/* Bee doesn't like this being gray like this. Dreev kinda does. The idea was to
-deemphasize it, like it's just there as a sanity check but mostly you care about
-your representation of the probability that you typed (like your "1/4", not the
-"0.25") and the spinner. That was also the rationale for having it off to the 
-side, when it fits there. */
-/*
-#prob    { color: #999999; }
-#probpre { color: #999999; }
-*/
-
 .content {
   display: flex;
   flex-direction: column;
@@ -83,19 +73,19 @@ button:active .button-text {
   transform: translateY(-2px);
 }
 
-.spin_container {
+.spin-wrap {
 	width: 100%;
 	height: 100%;
 	position: relative;
   margin-top: 35px;
   margin-bottom: 25px;
 }
-.spin_wrapper, :before, :after {
+#spinneroo, :before, :after {
   box-sizing:border-box;
   margin:0;
   padding:0;
 } 
-.spin_wrapper {
+#spinneroo {
 	max-width: 250px;
   max-height: 250px;
   position: relative;
@@ -107,7 +97,7 @@ button:active .button-text {
 }
 
 /* Little pointer triangle at the top of the spinner */
-.spin_wrapper:after {
+#spinneroo:after {
   content: '';
   position: absolute;
   left: 50%;
@@ -123,7 +113,8 @@ button:active .button-text {
   border-top: 30px solid #FFA514;
 }
 
-.spin {
+/* .spin */
+#spinneroo {
 	transform-origin: 50% 50%;
 }
 
@@ -134,3 +125,20 @@ input {
   width:95%;
   max-width: 390px; /* 390px is just enough for the placeholder text */
 }
+
+/* Bee doesn't like the "p=0.123" being gray. Dreev kinda does. The idea was to
+deemphasize it a lot because it's just there as a sanity check -- mostly you
+care about your representation of the probability that you typed (like your 
+"1/4", not the "0.25") and the spinner, which also shows the probability, as a 
+percentage. That was also the rationale for having it off to the side, when it
+fits there, or right below what you're typing otherwise. Having it normal text
+color and centered would slightly miss the point. As a highlighted output, it's
+redundant. The idea is to just have it as a very down-popped real-time sanity
+check on what you're typing. Like the computer whispering "just to be sure,
+here's what I'm hearing you as saying". The percentages on the spinner mostly 
+already do that but it might not be enough if you type something like "1/200" so
+I find it reassuring to have that extra "here's the exact eval on what you typed". It's kind of an anti-magic provision.
+Anyway, we'll see if any of that is persuasive to Bee! She's the one with the 
+best aesthetic sense for such things. */
+#prob    { color: #999999; }
+#probpre { color: #999999; }
