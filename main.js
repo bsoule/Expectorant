@@ -6,8 +6,7 @@ spinning the spinner.
 
 const INITPROB = .5 // the probability the spinner is preloaded with
 
-const VITTLES = shuffle([
-  "easter egg salad", // danny
+const VITTLES = [...shuffle([
   "five-spice fudge fajitas", // bluastelo
   "celery sundae", // bluastelo & danny
   "celeriac sundae", // bluastelo
@@ -42,7 +41,7 @@ const VITTLES = shuffle([
   "lime peel and watermelon seed stir fry", // christopher
   "deep-fried green tea 'n' coca-cola gummies", // ryan
   "deep-fried beet-flavored twinkies", // ryan
-])
+]), "easter egg salad"]
 
 let vindex = 0 // which vittle to use as an example in the instructions
 

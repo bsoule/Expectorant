@@ -122,9 +122,8 @@ function spinstop(spob) {
   spob.domo.innerHTML += `<path d="${arcPath(a, b)}" ` +
                            `fill="#00000000" stroke="white" stroke-width="2" />`
   $('theanswer').innerHTML = p < .01 ?
-    `<b>whoa, ${win.desc} won w/ p<.01</b>` :
-    `<b>${win.desc} won w/ p=${roundp(p, 3)}</b>`
-  // also should make the text color of the blurb red or green
+    `whoa, ${win.desc} won with p<.01` :
+    `${win.desc} won` + (spob.windex === 0 ? '' : ` with p=${roundp(p, 3)}`)
   $('theanswer').style.color = win.color
 }
 
@@ -205,8 +204,8 @@ function spinit(div, slots) { return {
 function genslots(p) {
   ASSERT(!Array.isArray(p), "More than 2 slots not supported yet")
   if (isNaN(p) || p < 0 || p > 1) {
-    const d1 = "bananas"
-    const d2 = "this can be anything cuz there's a 0% chance of seeing it"
+    const d1 = "nothing"
+    const d2 = "this can be any ol' string cuz there's a 0% chance of seeing it"
     return [ 
       { label: "🍌", prob: 1, kyoom: 1, color: 'black', desc: d1 },
       { label: "🍒", prob: 0, kyoom: 1, color: 'taupe', desc: d2 }, ]
