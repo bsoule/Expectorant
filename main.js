@@ -19,38 +19,43 @@ const VITTLES = [...shuffle([
   "garlic fudge nachos", // bluastelo & danny
   "kraken quesadillas", // GPT
   "wasabi waffles", // GPT
-  "banana and mustard sliders", // GPT
-  "apple and liver pâté panini", // GPT
-  "blueberry and beef jerky parfait", // GPT
+  "banana n' mustard sliders", // GPT
+  "apple n' liver pâté panini", // GPT
+  "blueberry n' beef jerky parfait", // GPT
   "tofu teriyaki tater tots", // GPT
   "crusty creamy croissant crumpet crumble", // bluastelo
   "cabbage kabobs", // danny
-  "ketchup'n'mustard spaghetti ice cream", // cantor
-  "deep fried mustard seed and cricket soup", // faire
-  "lady'n'tramp spaghetti", // danny & cantor
-  "peanut butter and jelly jalapeño jambalaya", // christopher
-  "bubble gum and butter sauce buffalo wings", // christopher
+  "ketchup n' mustard spaghetti ice cream", // cantor
+  "deep fried mustard seed n' cricket soup", // faire
+  "lady n' tramp spaghetti", // danny & cantor
+  "peanut butter n' jelly jalapeño jambalaya", // christopher
+  "bubble gum n' butter sauce buffalo wings", // christopher
   "pineapple pickle pizza", // christopher
   "deep-fried gazpacho", // danny
   "pickled mayonnaise lemonade", // melanie & eric
-  "cucumber and chocolate chip cookies", // christopher
+  "cucumber n' chocolate chip cookies", // christopher
   "glazed eel partially dipped in white chocolate with ketchup", // ryan
-  "flaming hot cheetos 'n' marshmallow fluff milkshake", // christopher
-  "apple skin 'n' sugared watermelon tacos", // ryan
-  "avocado and gummy bear salad", // christopher
-  "lime peel and watermelon seed stir fry", // christopher
-  "deep-fried green tea 'n' coca-cola gummies", // ryan
+  "flaming hot cheetos n' marshmallow fluff milkshake", // christopher
+  "apple skin n' sugared watermelon tacos", // ryan
+  "avocado n' gummy bear salad", // christopher
+  "lime peel n' watermelon seed stir fry", // christopher
+  "deep-fried green tea n' coca-cola gummies", // ryan
   "deep-fried beet-flavored twinkies", // ryan
   // the following aren't in Faire's poll yet
   // https://forms.gle/QrRRuRm2PqH3U4KY6
   "jellyfish jelly doughnuts", // GPT
-  "pickle and potato chip milkshake", // GPT
+  "pickle n' potato chip milkshake", // GPT
   "honey mustard ice cream sundae", // GPT
   "chocolate-covered chicken nuggets", // GPT
-  "bacon-wrapped pickle and cream cheese bites", // GPT
-  "sardine and marshmallow kabobs", // GPT
-  "peanut butter and jelly milkshake", // GPT
-
+  "bacon-wrapped pickle n' cream cheese bites", // GPT
+  "sardine n' marshmallow kabobs", // GPT
+  "peanut butter n' jelly milkshake", // GPT
+  "cold beet with mustard ice cream soup", // dreiley
+  "pulled pork n' mashed potato parfait", // the internet
+  "avocado milkshake", // the internet
+  "lobster ice cream", // the internet
+  "mac n' cheetos", // real thing
+  "jar of marmite", // danny
 ]), "easter egg salad"]
 
 let vindex = 0 // which vittle to use as an example in the instructions
