@@ -28,17 +28,17 @@ const VITTLES = [...shuffle([
   "ketchup n' mustard spaghetti ice cream", // cantor
   "deep fried mustard seed n' cricket soup", // faire
   "lady n' tramp spaghetti", // danny & cantor
-  "peanut butter n' jelly jalapeño jambalaya", // christopher
-  "bubble gum n' butter sauce buffalo wings", // christopher
-  "pineapple pickle pizza", // christopher
+  "peanut butter n' jelly jalapeño jambalaya", // christopher/GPT
+  "bubble gum n' butter sauce buffalo wings", // christopher/GPT
+  "pineapple pickle pizza", // christopher/GPT
   "deep-fried gazpacho", // danny
   "pickled mayonnaise lemonade", // melanie & eric
-  "cucumber n' chocolate chip cookies", // christopher
+  "cucumber n' chocolate chip cookies", // christopher/GPT
   "glazed eel partially dipped in white chocolate with ketchup", // ryan
-  "flaming hot cheetos n' marshmallow fluff milkshake", // christopher
+  "flaming hot cheetos n' marshmallow fluff milkshake", // christopher/GPT
   "apple skin n' sugared watermelon tacos", // ryan
-  "avocado n' gummy bear salad", // christopher
-  "lime peel n' watermelon seed stir fry", // christopher
+  "avocado n' gummy bear salad", // christopher/GPT
+  "lime peel n' watermelon seed stir fry", // christopher/GPT
   "deep-fried green tea n' coca-cola gummies", // ryan
   "deep-fried beet-flavored twinkies", // ryan
   // the following aren't in Faire's poll yet
@@ -50,12 +50,12 @@ const VITTLES = [...shuffle([
   "bacon-wrapped pickle n' cream cheese bites", // GPT
   "sardine n' marshmallow kabobs", // GPT
   "peanut butter n' jelly milkshake", // GPT
-  "cold beet with mustard ice cream soup", // dreiley
+  "cold beet with mustard ice cream soup", // dreiley, real thing
   "pulled pork n' mashed potato parfait", // the internet
   "avocado milkshake", // the internet
   "lobster ice cream", // the internet
   "mac n' cheetos", // real thing
-  "jar of marmite", // danny
+  "marmite milkshake", // danny
 ]), "easter egg salad"]
 
 let vindex = 0 // which vittle to use as an example in the instructions
@@ -64,6 +64,7 @@ const CLOG = console.log
 const ASSERT = console.assert
 function $(id) { return document.getElementById(id) } // to be jQuery-esque
 
+let spincount = 0   // We show this under the input field
 let lastp = null    // Just some global variables to track the fraction of yeses
 let yeses = 0       // for all the spins we've done since we last changed the
 let trials = 0      // probability.
@@ -71,6 +72,7 @@ let trials = 0      // probability.
 // Take a probability and a spin object, pick the winner and spin that puppy
 function expectorize(spob) {
   $('theanswer').innerHTML = '&nbsp;'
+  $('counter').innerHTML = ++spincount
   $('vittle').innerHTML = VITTLES[++vindex % VITTLES.length]
   $('audiotag1').play()
   spindraw(spob)

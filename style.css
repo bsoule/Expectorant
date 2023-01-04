@@ -133,16 +133,21 @@ care about your representation of the probability that you typed (like your
 percentage. That was also the rationale for having it off to the side, when it
 fits there, or right below what you're typing otherwise. Having it normal text
 color and centered would slightly miss the point. As a highlighted output, it's
-redundant. The idea is to just have it as a very down-popped real-time sanity
-check on what you're typing. Like the computer whispering "just to be sure,
-here's what I'm hearing you as saying". The percentages on the spinner mostly 
-already do that but it might not be enough if you type something like "1/200" so
-I find it reassuring to have that extra "here's the exact eval on what you typed". It's kind of an anti-magic provision.
+redundant. The idea is to just have it as a very down-popped real-time check on
+what you're typing. Like the computer whispering "just to be sure, here's what
+I'm hearing you as saying". The percentages on the spinner mostly already do
+that but it might not be enough if you type something like "1/200" so I find it
+reassuring to have that extra "here's the exact eval on what you typed". It's
+kind of an anti-magic provision.
 Anyway, we'll see if any of that is persuasive to Bee! She's the one with the 
 best aesthetic sense for such things. */
 #prob    { color: #999999; }
 #probpre { color: #999999; }
 
+#counter-wrap { 
+  color: #999999; 
+  float: right;
+}
 
 /* Here's an idea for a fancier button but it doesn't seem much better than what
 we have. It's from https://www.joshwcomeau.com/animation/3d-button/
