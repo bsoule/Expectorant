@@ -141,8 +141,7 @@ reassuring to have that extra "here's the exact eval on what you typed". It's
 kind of an anti-magic provision.
 Anyway, we'll see if any of that is persuasive to Bee! She's the one with the 
 best aesthetic sense for such things. */
-#prob    { color: #999999; }
-#probpre { color: #999999; }
+#prob-wrap { color: #999999; }
 
 #counter-wrap { 
   color: #999999; 
