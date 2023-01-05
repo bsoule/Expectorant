@@ -92,12 +92,12 @@ Suppose you owe me an especially awkward amount like $8.27 and you have a five a
 Paying me $5 is <i>kind of</i> close so if you probably give the five and maybe give me the twenty then that could be fair.
 Can we make it exactly fair?
 Yes we can!
-If you enter the amount you owe, an @-sign, followed by two amounts
-&mdash; the first lower than you owe and the second greater &mdash;
-then Expectorant will turn that “probably” and “maybe” into exact probabilities.
+Enter the amount you owe, an @-sign, followed by two amounts
+&mdash; the first lower than you owe and the second greater.
+Expectorant turns that “probably” and “maybe” into exact probabilities.
 In this example you'd type
-<code>8.27@5,20</code>.
-That gets turned into 
+<code>8.27@5,20</code>
+which gets turned into 
 $$\frac{8.27-5}{20-5} \approx 22\%$$
 which is the probability \(p\) such that 
 \((1-p)\cdot 5 + p\cdot 20 = 8.27\).

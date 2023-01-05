@@ -39,7 +39,8 @@ code {
 
 /* Put the version in itty-bitty gray font in the bottom corner of the page */
 .versiontag {
-  color: hsla(17deg 13% 19% 20%);
+  /* color: hsla(17deg 13% 19% 20%); */
+  color: #999999;
   font-size: 9px;
   position: fixed;
   bottom: 0;
