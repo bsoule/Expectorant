@@ -13,8 +13,8 @@ it way better.
 
 // Config constants; see also ease() to pick the easing function
 const DROT = 4        // number of extra full rotations before landing on winner
-const KEXP = .001/3   // exponential decay parameter
-const KBER = .96      // Bernoulli (different Bernoulli, probably) parameter
+const KEXP = .001/3    // exponential decay parameter
+const KBER = .96        // Bernoulli (different Bernoulli, probably) parameter
 const KPOL = 3.7      // parameter giving the polynomial degree
 const BOOP = 4400   // length of the audio clip in milliseconds
 const SUSP = 500  // extra milliseconds after beep-boop stops till spinner stops
