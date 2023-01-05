@@ -33,7 +33,7 @@
 </head>
 <body>
 
-<div class='versiontag'>v2023.01.05a&nbsp;</div>
+<div class='versiontag'>v2023.01.05b&nbsp;</div>
 <div class="content">
 <h1>Expectorant</h1>
 
@@ -104,7 +104,7 @@ which is the probability \(p\) such that
 That's the exquisitely fair probability \(p\) vs \(1-p\) that you should give me the twenty vs the five so that you're giving me exactly $8.27 in expectation!
 </p>
   
-<h2>Stochastic nerdtastic restaurant bill splitting
+<h2>Stochastic, nerdtastic restaurant bill splitting
 &mdash; <code>:</code> syntax</h2>
   
 <p>
@@ -112,7 +112,7 @@ Say the subtotal for your restaurant bill is $100 and the items on the bill are 
 Enter <code>100:5</code> and have the person who ordered the $5 item spin the spinner.
 If it comes up green (a 5% chance) they get to pay the whole bill! 
 If not, amend the expression as <code>100:5,25</code> and repeat for the person who got the $25 item. 
-They'll "win" with probability \(\frac{25}{100-5}\). 
+They'll “win” with probability \(\frac{25}{100-5}\). 
 If they're off the hook, amend again to <code>100:5,25,60</code>. 
 This time most likely, 
 \(p = \frac{60}{100-5-25} \approx 86\%\),
@@ -124,7 +124,7 @@ So if the process makes it to the last item on the bill then whoever got that it
 </p>
   
 <p>
-Mathemagically, it doesn't matter what order you put the items in &mdash; each person "wins" (pays the whole bill) with probability equal to their own fair share of the bill.
+Mathemagically, it doesn't matter what order you put the items in &mdash; each person “wins” (pays the whole bill) with probability equal to their own fair share of the bill.
 In other words, you pay in expectation exactly your fair share. 
 <i>Including tax and tip</i>, even though we never entered those.
 Pretty slick!
