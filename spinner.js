@@ -197,11 +197,18 @@ function spinit(div, slots) { return {
   dcur:   0,                        // current distance in degrees it has spun
 }}
 
+const Scenario = {
+  General: 0,
+  RepayOneNote: 1,
+  RepayTwoNotes: 2,
+  SplitBill: 3,
+}
+
 // Generate a list of slots from a probability (just need one probability for
 // two slots) or a list of probabilities that sum to one.
 // For the case of 2 slots in Expectorant, the first slot is for
 // yes/pay/high/green and the second is for no/free/low/red.
-function genslots(p) {
+function genslots(p, scenario) {
   ASSERT(!Array.isArray(p), "More than 2 slots not supported yet")
   if (isNaN(p) || p < 0 || p > 1) {
     const d1 = "nothing"
@@ -210,9 +217,21 @@ function genslots(p) {
       { label: "🍌", prob: 1, kyoom: 1, color: 'black', desc: d1 },
       { label: "🍒", prob: 0, kyoom: 1, color: 'taupe', desc: d2 }, ]
   } else {
-    const d1 = "YES / PAY / HIGH"
-    const d2 = "NO / FREE / LOW"
-    return [ 
+    if (scenario == Scenario.RepayOneNote) {
+      var d1 = "YES / PAY"
+      var d2 = "NO / FREE"
+    } else if (scenario == Scenario.RepayTwoNotes) {
+      d1 = "PAY HIGH"
+      d2 = "PAY LOW"
+    } else if (scenario == Scenario.SplitBill) {
+      d1 = "PAY"
+      d2 = "FREE"
+    } else {
+      d1 = "YES / PAY / HIGH"
+      d2 = "NO / FREE / LOW"
+    }
+
+    return [
       { label: percentify(p),   prob: p,   kyoom: p, color: YAYCOLOR, desc: d1},
       { label: percentify(1-p), prob: 1-p, kyoom: 1, color: NAYCOLOR, desc: d2},
     ]
