@@ -93,20 +93,27 @@ function expectorize(spob) {
   spingo(spob, windex)
 }
   
-document.addEventListener('DOMContentLoaded', () => { // -------- document-ready
+function expectorizeRepay(spob) {
+  expectorize(spob)
+}
 
+document.addEventListener('DOMContentLoaded', () => { // -------- document-ready
 $('expr').focus() // this can be annoying when developing cuz it steals focus
 $('prob').innerHTML = INITPROB
 $('vittle').innerHTML = VITTLES[vindex]
 const spob = spinit(document.querySelector('#spinneroo'), genslots(INITPROB))
 spindraw(spob)
-  
-// Update the slots and redraw the spinner on every keystroke in the input field
-$('expr').addEventListener('input', e => {
-  const p = probabilify(e.target.value)
+
+function redrawSlots() {
+  const p = probabilify($('expr').value)
   $('prob').innerHTML = roundp(p, 8) // max 17; make it big for debugging
   spob.slots = genslots(p)
   spindraw(spob)
+}
+
+// Update the slots and redraw the spinner on every keystroke in the input field
+$('expr').addEventListener('input', e => {
+  redrawSlots()
 })
 
 $('expectorize').addEventListener('click', e => expectorize(spob))
@@ -116,6 +123,41 @@ $('expr').addEventListener('keyup', e => {
 })
 $('expr').addEventListener('keydown', e => {
   if (e.metaKey && e.key === "Enter") expectorize(spob)
+})
+
+const fieldNames = ['expr-repay-note1', 'expr-repay-note2', 'expr-repay-owe']
+fieldNames.forEach((fieldName) => {
+  // Make any input update the main input field and redraw the spinner
+  $(fieldName).addEventListener('input', e => {
+    const notes = []
+    if ($('expr-repay-note1').value) {
+      notes.push($('expr-repay-note1').value)
+    }
+    if ($('expr-repay-note2').value) {
+      notes.push($('expr-repay-note2').value)
+    }
+    if (notes.length == 2) {
+      if (parseInt(notes[0]) > parseInt(notes[1])) {
+        var swap = notes[0]
+        notes[0] = notes[1]
+        notes[1] = swap
+      }
+
+      // 8.27@5,20 means I owe 8.27 but have a $5 note and a $20 note
+      $('expr').value = `${$('expr-repay-owe').value}@${notes[0]},${notes[1]}`
+    } else {
+      // 7/20 means I owe 7 but have a $20 note
+      $('expr').value = `${$('expr-repay-owe').value}/${notes[0]}`
+    }
+
+    redrawSlots()
+  })
+  $(fieldName).addEventListener('keyup', e => {
+    if (e.key==="Enter") expectorizeRepay(spob)
+  })
+  $(fieldName).addEventListener('keydown', e => {
+    if (e.metaKey && e.key === "Enter") expectorizeRepay(spob)
+  })
 })
 
 }) // ------------------------------------------------------- end document-ready
