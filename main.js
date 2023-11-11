@@ -168,6 +168,11 @@ fieldNames.forEach((fieldName) => {
   })
 })
 
+$('audiotag1').muted = $('mute').checked
+$('mute').addEventListener('change', e => {
+  $('audiotag1').muted = e.target.checked
+})
+
 }) // ------------------------------------------------------- end document-ready
 
 function shuffle(l) {
