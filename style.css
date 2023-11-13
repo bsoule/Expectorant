@@ -117,12 +117,15 @@ button:active .button-text {
 /* .spin */
 #spinneroo { transform-origin: 50% 50%; }
 
-input { 
+input {
   height: 24px;
   padding: 8px;
   font-size: 16pt;
-  width:95%;
-  max-width: 390px; /* 390px is just enough for the placeholder text */
+  width: 390px; /* 390px is just enough for the placeholder text */
+}
+
+input.exact-change {
+  width: 335px;
 }
 
 /* Bee doesn't like the "p=0.123" being gray. Dreev kinda does. The idea was to
