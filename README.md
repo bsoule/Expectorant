@@ -18,3 +18,8 @@
 </pre>
 
 New name idea: Bernoullinator? Cuz it does Bernoulli trials? Then instead of "expectorize" it'd be "bernoullinate". But it seems "Expectorant" was pretty sticky, so to speak. :)
+
+## Try it out
+
+Expectorant is online for all your stochastic bill splitting and repayment needs:
+[expectorant.yootl.es](https://expectorant.yootl.es)
