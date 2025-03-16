@@ -197,18 +197,28 @@ function spinit(div, slots) { return {
   dcur:   0,                        // current distance in degrees it has spun
 }}
 
-const Scenario = {
-  General: 0,
-  RepayOneNote: 1,
-  RepayTwoNotes: 2,
-  SplitBill: 3,
-}
+
+// Note: Daniel Zwell had added some functionality here to keep track of which 
+// of four scenarios we were in: 
+// 0. the general case, non-beginner mode
+// 1. the beginner mode case of owing an amount of money but only have a 
+//    banknote that's more than that
+// 2. the beginner mode case of owing an amount of money and having two 
+//    banknotes -- one lower and one higher than the amount owed
+// 3. the case of splitting a restaurant bill
+// We decided it's cleaner to not keep track of that and just always treat the
+// spinner the same way regardless of the scenario. 
+// See the anti-magic principle. blog.beeminder.com/magic
+// It may still be worth it though, if we wanted to turn the beginner-
+// friendliness up a notch and say more explicitly things like "the spinner came
+// out red so you should pay the lower amount of $5" or whatever.
+
 
 // Generate a list of slots from a probability (just need one probability for
 // two slots) or a list of probabilities that sum to one.
 // For the case of 2 slots in Expectorant, the first slot is for
 // yes/pay/high/green and the second is for no/free/low/red.
-function genslots(p, scenario) {
+function genslots(p) {
   ASSERT(!Array.isArray(p), "More than 2 slots not supported yet")
   if (isNaN(p) || p < 0 || p > 1) {
     const d1 = "nothing"
@@ -217,21 +227,9 @@ function genslots(p, scenario) {
       { label: "🍌", prob: 1, kyoom: 1, color: 'black', desc: d1 },
       { label: "🍒", prob: 0, kyoom: 1, color: 'taupe', desc: d2 }, ]
   } else {
-    if (scenario == Scenario.RepayOneNote) {
-      var d1 = "YES / PAY"
-      var d2 = "NO / FREE"
-    } else if (scenario == Scenario.RepayTwoNotes) {
-      d1 = "PAY HIGH"
-      d2 = "PAY LOW"
-    } else if (scenario == Scenario.SplitBill) {
-      d1 = "PAY"
-      d2 = "FREE"
-    } else {
-      d1 = "YES / PAY / HIGH"
-      d2 = "NO / FREE / LOW"
-    }
-
-    return [
+    const d1 = "YES / PAY / HIGH"
+    const d2 = "NO / FREE / LOW"
+    return [ 
       { label: percentify(p),   prob: p,   kyoom: p, color: YAYCOLOR, desc: d1},
       { label: percentify(1-p), prob: 1-p, kyoom: 1, color: NAYCOLOR, desc: d2},
     ]

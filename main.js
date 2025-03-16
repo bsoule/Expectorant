@@ -105,24 +105,15 @@ $('vittle').innerHTML = VITTLES[vindex]
 const spob = spinit(document.querySelector('#spinneroo'), genslots(INITPROB))
 spindraw(spob)
 
-function redrawSlots(scenario) {
+function redrawSlots() {
   const p = probabilify($('expr').value)
   $('prob').innerHTML = roundp(p, 8) // max 17; make it big for debugging
-  spob.slots = genslots(p, scenario)
+  spob.slots = genslots(p)
   spindraw(spob)
 }
 
 // Update the slots and redraw the spinner on every keystroke in the input field
-$('expr').addEventListener('input', e => {
-  // Consider this a two-bill repayment choice only if it's syntactically specified:
-  if (e.target.value.includes('@')) {
-    var scenario = Scenario.RepayTwoNotes
-  } else if (e.target.value.includes(':')) {
-    scenario = Scenario.SplitBill
-  }
-  redrawSlots(scenario)
-})
-
+$('expr').addEventListener('input', e => { redrawSlots() })
 $('expectorize').addEventListener('click', e => expectorize(spob))
 $('spinneroo')  .addEventListener('click', e => expectorize(spob))
 $('expr').addEventListener('keyup', e => {
@@ -149,16 +140,13 @@ fieldNames.forEach((fieldName) => {
         notes[0] = notes[1]
         notes[1] = swap
       }
-
       // 8.27@5,20 means I owe 8.27 but have a $5 note and a $20 note
       $('expr').value = `${$('expr-repay-owe').value}@${notes[0]},${notes[1]}`
-
-      redrawSlots(Scenario.RepayTwoNotes)
+      redrawSlots()
     } else {
-      // 7/20 means I owe 7 but have a $20 note
+      // 7/20 means I owe 7 but have a $20 note (same as 7@0,20)
       $('expr').value = `${$('expr-repay-owe').value}/${notes[0]}`
-
-      redrawSlots(Scenario.RepayOneNote)
+      redrawSlots()
     }
   })
   $(fieldName).addEventListener('keyup', e => {
