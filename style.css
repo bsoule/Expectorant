@@ -2,15 +2,13 @@
 
 :root { --color-bg: #f4f0bb; }
 
-/* Apparently this isn't used anywhere? Bethany? #SCHDEL
-.thing {
-color: #da2c38
+.testingColors { color: 
+#da2c38
 #43291f
 #f4f0bb
 #226f54
 #87c38f
 }
-*/
 
 body {
   font-family: HK Grotesk;

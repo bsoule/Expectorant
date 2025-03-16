@@ -6,13 +6,13 @@ spinning the spinner.
 
 const INITPROB = .5 // the probability the spinner is preloaded with
 
+// Faire made a poll for voting on these: https://forms.gle/QrRRuRm2PqH3U4KY6
+// Now we shuffle them and stick "easter egg salad" on the end.
 const VITTLES = [...shuffle([
   "five-spice fudge fajitas", // bluastelo
   "celery sundae", // bluastelo & danny
-  "celeriac sundae", // bluastelo
   "nightshade nutmeg nachos", // bluastelo
   "marshmallow mustard muffins", // bluastelo
-  "marshmallow mustard m&m muffins", // bluastelo
   "chili cheese cotton candy", // GPT
   "apple vanilla nachos", // bluastelo
   "chelation cheeze", // bluastelo
@@ -41,8 +41,6 @@ const VITTLES = [...shuffle([
   "lime peel n' watermelon seed stir fry", // christopher/GPT
   "deep-fried green tea n' coca-cola gummies", // ryan
   "deep-fried beet-flavored twinkies", // ryan
-  // the following aren't in Faire's poll yet
-  // https://forms.gle/QrRRuRm2PqH3U4KY6
   "jellyfish jelly doughnuts", // GPT
   "pickle n' potato chip milkshake", // GPT
   "honey mustard ice cream sundae", // GPT
@@ -56,6 +54,8 @@ const VITTLES = [...shuffle([
   "lobster ice cream", // the internet
   "mac n' cheetos", // real thing
   "marmite milkshake", // danny
+  "cotton candy kimchi cupcakes", // GPT-4.5
+  "sriracha strawberry shortcake sliders", // GPT-4.5
 ]), "easter egg salad"]
 
 let vindex = 0 // which vittle to use as an example in the instructions
@@ -98,6 +98,7 @@ function expectorizeRepay(spob) {
 }
 
 document.addEventListener('DOMContentLoaded', () => { // -------- document-ready
+
 $('expr').focus() // this can be annoying when developing cuz it steals focus
 $('prob').innerHTML = INITPROB
 $('vittle').innerHTML = VITTLES[vindex]

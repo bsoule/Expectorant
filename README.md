@@ -5,6 +5,7 @@
 ## Changelog
 
 <pre>
+2025-03-15: Play w/ easter egg salad and get off Replit
 2022-12-30: Easter egg salad, long story
 2022-12-29: Lots of fussing and tweaking
 2022-12-23: Better rounding and other polishing
