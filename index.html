@@ -37,17 +37,31 @@
 <div class="content">
 <h1>Expectorant</h1>
 
-<details open id="beginner-mode">
+<details id="beginner-mode"> <!-- add open="true" for default-uncollapsed -->
   <summary style="cursor: pointer"><i>beginner mode for making stochastically exact change</i></summary>
-<br>
-<div>
-  <input type="number" class="exact-change" id="expr-repay-owe" type="text" size="80" placeholder="You owe this much"/>
-  <input type="number" class="exact-change" id="expr-repay-note1" type="text" size="80" placeholder="You have this note"/>
-  <input type="number" class="exact-change" id="expr-repay-note2" type="text" size="80" placeholder="Optional: you also have this note"/>
-</div>
-<br>
+  <div class="beginner-container">
+    <div class="beginner-field amount-owed">
+      <label for="expr-repay-owe">Amount you owe</label>
+      <input type="number" class="exact-change" id="expr-repay-owe" type="text"/>
+    </div>
+    
+    <div class="beginner-row">
+      <div class="beginner-field">
+        <label for="expr-repay-note1">Lower amount you have</label>
+        <input type="number" class="exact-change" id="expr-repay-note1" type="text" 
+               placeholder="e.g. 5 (default $0)"/>
+      </div>
+      <div class="beginner-field">
+        <label for="expr-repay-note2">Higher amount you have</label>
+        <input type="number" class="exact-change" id="expr-repay-note2" type="text"/>
+      </div>
+    </div>
+    <div class="implies-arrow">\(\implies\)</div>
+  </div>
 </details>
+
 <br>
+
 <div>
   <input id="expr" type="text" size="80"
          placeholder="Expression that evaluates to a probability"/>

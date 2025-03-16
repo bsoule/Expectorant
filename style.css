@@ -25,14 +25,64 @@ p {
   line-height: 145%; /* the max that practicaltypography.com recommends */
 }
 
-/* Fancy distinctive display of examples of text the user can type in the 
-Expectorant input field */
-code {
-  padding: 2px 4px;
-  color: #d14;
-  white-space: nowrap;
-  background-color: #f7f7f9;
-  border: 1px solid #e1e1e8;
+/* Beginner mode styles */
+.beginner-container {
+  width: 390px; /* Match expr input width */
+  margin: 1em auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+}
+
+.beginner-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25em;
+}
+
+.beginner-field label {
+  font-size: 14px;
+  color: hsl(17deg 13% 19%);
+  text-align: left;
+  margin-left: 4px;
+}
+
+.amount-owed {
+  align-self: center;
+  width: 150px;
+}
+
+.beginner-row {
+  display: flex;
+  gap: 1em;
+  width: 100%;
+}
+
+.beginner-row .beginner-field {
+  flex: 1;
+}
+
+.implies-arrow {
+  text-align: center;
+  margin: 0.5em 0;
+  font-size: 24px;
+  color: #666;
+  font-family: "Times New Roman", serif;
+}
+
+
+input {
+  height: 24px;
+  padding: 8px;
+  font-size: 16pt;
+  width: 390px; /* 390px is just enough for the placeholder text */
+}
+
+input.exact-change {
+  width: 100%;
+  height: 24px;
+  padding: 4px 8px;
+  font-size: 14pt;
 }
 
 /* Put the version in itty-bitty gray font in the bottom corner of the page */
@@ -114,17 +164,6 @@ button:active .button-text {
 
 /* .spin */
 #spinneroo { transform-origin: 50% 50%; }
-
-input {
-  height: 24px;
-  padding: 8px;
-  font-size: 16pt;
-  width: 390px; /* 390px is just enough for the placeholder text */
-}
-
-input.exact-change {
-  width: 335px;
-}
 
 /* Bee doesn't like the "p=0.123" being gray. Dreev kinda does. The idea was to
 deemphasize it a lot because it's just there as a sanity check -- mostly you
