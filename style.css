@@ -49,12 +49,12 @@ p {
 
 .amount-owed {
   align-self: center;
-  width: 150px;
+  width: 108px;
 }
 
 .beginner-row {
   display: flex;
-  gap: 1em;
+  gap: 2em;  /* Increased from 1em */
   width: 100%;
 }
 
@@ -64,12 +64,14 @@ p {
 
 .implies-arrow {
   text-align: center;
-  margin: 0.5em 0;
+  /* ADJUST VERTICAL WHITESPACE HERE:
+     First number (0.7em) = space above arrow
+     Second number (0.1em) = space below arrow */
+  margin: 0.7em 0 0.1em 0;
   font-size: 24px;
   color: #666;
   font-family: "Times New Roman", serif;
 }
-
 
 input {
   height: 24px;
@@ -100,6 +102,9 @@ input.exact-change {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  padding: 0 1rem;
+  max-width: 100%;
+  margin: 0 auto;
 }
 
 button {
@@ -110,6 +115,7 @@ button {
   cursor: pointer;
   outline-offset: 4px;
 }
+
 .button-text {
   display: block;
   padding: 12px 42px;
@@ -118,31 +124,33 @@ button {
   background: hsl(128deg 33% 65%);
   transform: translateY(-6px);
 }
+
 button:active .button-text {
   transform: translateY(-2px);
 }
 
 .spin-wrap {
-	width: 100%;
-	height: 100%;
-	position: relative;
-  margin-top: 35px;
-  margin-bottom: 25px;
+  width: 100%;
+  max-width: 250px;
+  height: auto;
+  position: relative;
+  margin: 35px auto 25px;
 }
+
 #spinneroo, :before, :after {
   box-sizing:border-box;
   margin:0;
   padding:0;
 } 
 #spinneroo {
-	max-width: 250px;
+  max-width: 250px;
   max-height: 250px;
   position: relative;
   margin: auto;
-	border-radius: 50%;
-	background: #ffffff;
-	border: 2px solid #ffffff;
-	box-shadow: 0px 2px 5px 1px rgba(0,0,0, 0.3);
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2px solid #ffffff;
+  box-shadow: 0px 2px 5px 1px rgba(0,0,0, 0.3);
 }
 
 /* Little pointer triangle at the top of the spinner */
@@ -186,4 +194,15 @@ that wants down-popped a lot. */
 #counter-wrap { 
   color: #999999; 
   float: right;
+}
+
+@media (max-width: 380px) {
+  input {
+    font-size: 14pt;
+  }
+  
+  .button-text {
+    padding: 10px 30px;
+    font-size: 1.1rem;
+  }
 }
