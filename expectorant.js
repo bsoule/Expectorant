@@ -27,16 +27,15 @@ function for doing that evaluation and getting an actual number.
 function percentify(x) { return Math.round(100*x) + "%" }
 
 // Renormalize a list of weights to sum to 1
-function renorm(w) {
-  const tot = w.reduce((a,b)=>a+b)
-  return w.map(x=>x/tot)
-}
+function renorm(w) { const tot = w.reduce((a,b)=>a+b); return w.map(x=>x/tot) }
 
 // Return a list of the cumulative sums of l. Eg, [1,2,3] -> [1,3,6]
-function accum(l) {
-  let s = 0
-  return l.map(x => { s += x; return s })
-}
+function accum(l) { let s = 0; return l.map(x => { s += x; return s }) }
+
+/* Arguably better versions of accum HT GPT-5:
+function accum(l) { let s=0, a=[]; for (const x of l) a.push(s += x); return a }
+function accum(l) { return l.reduce((a,x)=>(a.push((a[a.length-1]||0)+x),a),[])}
+*/
 
 // Take a number p in [0,1] and list of non-negative weights w and return the
 // (0-based) index of the appropriate weight. Eg, if the weights are [99, 1]
@@ -51,9 +50,7 @@ function spinHelper(p, w) {
 // normalize to probabilities.
 // Eg, spinpick(["a","b","c"], [1,2,1]) returns "a" w/ p=.25, "b" w/ p=.5 etc.
 function spinpick(l, w=null) { 
-  if (w===null) {
-    w = Array(l.length).fill(1)
-  }
+  if (w === null) w = Array(l.length).fill(1)
   return l[spinHelper(Math.random(), w)] 
 }
 
@@ -64,15 +61,23 @@ for (let i=0; i<1e7; i++) { sum += spinpick([1,0], [p, 1-p]) }
 sum/1e7 // should match p pretty closely
 */
 
+// NON-DRY WARNING: master copy lives in H.M.S. Parsafore
+function deoctalize(s) {
+  if (s.includes('z')) return "ERROR"        // z is our sentinel
+  s = s.replace(/\b0+\b/g, 'z')              // replace bare zeros with sentinel 
+       .replace(/[1-9\.]0+/g, m => m.replace(/0/g, 'z'))  // save these too
+       .replace(/0/g, '')                    // throw away the rest of the zeros
+       .replace(/z/g, '0')                   // turn sentinels back to zeros
+  return s
+}
+
 // Eval but just return null if syntax error.
 // Obviously don't use serverside with user-supplied input.
 function laxeval(s) {
   try {
-    const x = eval(s)
+    const x = eval(deoctalize(s))
     return typeof x === "undefined" ? null : x
-  } catch (e) {
-    return null
-  }
+  } catch (e) { return null }
 }
 
 // Parse an arbitrary arithmetic expression meant to represent a probability,

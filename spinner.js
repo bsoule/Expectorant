@@ -1,4 +1,4 @@
-/* Visually spinning a spinner
+/* Visually spin a spinner
 
 Here we provide the following functions to the website's Javascript (main.js):
 
@@ -223,9 +223,9 @@ function genslots(p) {
   if (isNaN(p) || p < 0 || p > 1) {
     const d1 = "nothing"
     const d2 = "this can be any ol' string cuz there's a 0% chance of seeing it"
-    return [ 
-      { label: "🍌", prob: 1, kyoom: 1, color: 'black', desc: d1 },
-      { label: "🍒", prob: 0, kyoom: 1, color: 'taupe', desc: d2 }, ]
+    return [ // show bananas cuz it's bananas; cherries shown with 0 probability
+      { label: "🍌🍌", prob: 1, kyoom: 1, color: 'black', desc: d1 },
+      { label: "🍒🍒", prob: 0, kyoom: 1, color: 'taupe', desc: d2 }, ]
   } else {
     const d1 = "YES / PAY / HIGH"
     const d2 = "NO / FREE / LOW"

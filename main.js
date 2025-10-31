@@ -92,10 +92,8 @@ function expectorize(spob) {
     `${yeses}/${trials} = ${percentify(yeses/trials)} yeses so far w/ p=${p}`)
   spingo(spob, windex)
 }
-  
-function expectorizeRepay(spob) {
-  expectorize(spob)
-}
+
+function expectorizeRepay(spob) { expectorize(spob) }
 
 document.addEventListener('DOMContentLoaded', () => { // -------- document-ready
 
